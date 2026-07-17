@@ -1,0 +1,2 @@
+ALTER TABLE users
+  ADD COLUMN calendarFeedToken VARCHAR(64) NULL UNIQUE;

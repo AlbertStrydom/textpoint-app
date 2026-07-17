@@ -1,0 +1,2 @@
+ALTER TABLE methods
+  ADD COLUMN color VARCHAR(20) NULL;
