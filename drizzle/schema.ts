@@ -1,16 +1,122 @@
 import {
-  int,
-  mysqlEnum,
-  mysqlTable,
+  boolean,
+  date,
+  integer,
+  jsonb,
+  numeric,
+  pgEnum,
+  pgTable,
+  serial,
   text,
   timestamp,
   varchar,
-  decimal,
-  boolean,
-  json,
-  datetime,
-  date,
-} from "drizzle-orm/mysql-core";
+} from "drizzle-orm/pg-core";
+
+// ---------------------------------------------------------------------------
+// PostgreSQL enums
+// PostgreSQL requires enum types to be declared independently of tables.
+// ---------------------------------------------------------------------------
+
+export const usersRoleEnum = pgEnum("users_role_enum", ["user", "admin", "super_admin"]);
+export const coursesLevelEnum = pgEnum("courses_level_enum", ["Level 1", "Level 2", "Level 3"]);
+export const courseSchedulesStatusEnum = pgEnum("course_schedules_status_enum", ["Scheduled", "In Progress", "Completed", "Cancelled"]);
+export const enrollmentsStatusEnum = pgEnum("enrollments_status_enum", ["Active", "Completed", "Withdrawn", "Suspended"]);
+export const attendanceStatusEnum = pgEnum("attendance_status_enum", ["Present", "Absent", "Late", "Excused"]);
+export const assessmentsAssessmentTypeEnum = pgEnum("assessments_assessment_type_enum", ["Theory", "Practical"]);
+export const assessmentsResultEnum = pgEnum("assessments_result_enum", ["Pass", "Fail", "Incomplete"]);
+export const certificatesStatusEnum = pgEnum("certificates_status_enum", ["Active", "Expired", "Revoked"]);
+export const levelIIIClientsVisitCadenceEnum = pgEnum("level_iiiclients_visit_cadence_enum", ["Weekly", "Monthly", "Six Monthly"]);
+export const levelIIIActivitiesActivityTypeEnum = pgEnum("level_iiiactivities_activity_type_enum", ["Visit", "Call", "Email", "Assessment", "Procedure Review", "General"]);
+export const levelIIIActivitiesStatusEnum = pgEnum("level_iiiactivities_status_enum", ["Planned", "Completed", "Cancelled"]);
+export const levelIIITechnicianCertificatesValidityUnitEnum = pgEnum("level_iiitechnician_certificates_validity_unit_enum", ["days", "months", "years", "custom"]);
+export const levelIIITechnicianCertificatesStatusEnum = pgEnum("level_iiitechnician_certificates_status_enum", ["Active", "Expired", "Revoked", "Superseded"]);
+export const levelIIITechnicianCertificatesApprovalStatusEnum = pgEnum("level_iiitechnician_certificates_approval_status_enum", ["draft", "in_review", "approved", "rejected"]);
+export const levelIIITechnicianCertificateExportsExportFormatEnum = pgEnum("level_iiitechnician_certificate_exports_export_format_enum", ["html", "pdf"]);
+export const portalClientUsersAccessLevelEnum = pgEnum("portal_client_users_access_level_enum", ["viewer", "editor", "manager"]);
+export const portalTechnicianRequirementsStatusEnum = pgEnum("portal_technician_requirements_status_enum", ["missing", "current", "no_expiry", "expiring", "expired", "pending_review"]);
+export const portalClientDocumentsStatusEnum = pgEnum("portal_client_documents_status_enum", ["active", "archived", "superseded"]);
+export const portalClientCommentsRequestTypeEnum = pgEnum("portal_client_comments_request_type_enum", ["general_comment", "contact_request", "suggestion"]);
+export const portalClientCommentsStatusEnum = pgEnum("portal_client_comments_status_enum", ["open", "acknowledged", "closed"]);
+export const portalClientResourcesResourceTypeEnum = pgEnum("portal_client_resources_resource_type_enum", ["file", "link"]);
+export const portalApprovalRequestsEntityTypeEnum = pgEnum("portal_approval_requests_entity_type_enum", ["technician", "requirement_record", "client_document", "resource"]);
+export const portalApprovalRequestsActionEnum = pgEnum("portal_approval_requests_action_enum", ["create", "update", "delete", "upsert"]);
+export const portalApprovalRequestsStatusEnum = pgEnum("portal_approval_requests_status_enum", ["pending", "approved", "rejected"]);
+export const levelIIIAssessmentsResultEnum = pgEnum("level_iiiassessments_result_enum", ["Pass", "Fail", "Observation", "Pending Review"]);
+export const levelIIIEquipmentStatusEnum = pgEnum("level_iiiequipment_status_enum", ["Available", "In Service", "Calibration Due", "Out of Service"]);
+export const levelIIISpecimensStatusEnum = pgEnum("level_iiispecimens_status_enum", ["Available", "In Use", "Shared", "Retired"]);
+export const levelIIISpecimensMasteringStatusEnum = pgEnum("level_iiispecimens_mastering_status_enum", ["Mastered", "Re-master Required", "Pending"]);
+export const equipmentStatusEnum = pgEnum("equipment_status_enum", ["Active", "Inactive", "Maintenance", "Retired"]);
+export const equipmentDocumentsDocumentTypeEnum = pgEnum("equipment_documents_document_type_enum", ["Manual", "Certificate", "Specification", "Maintenance Log", "Other"]);
+export const specimensStatusEnum = pgEnum("specimens_status_enum", ["Available", "In Use", "Loaned Out", "Quarantine", "Retired"]);
+export const specimensMasteringStatusEnum = pgEnum("specimens_mastering_status_enum", ["Mastered", "Re-master Required", "Pending"]);
+export const kpiQuestionsQuestionTypeEnum = pgEnum("kpi_questions_question_type_enum", ["Text", "MultipleChoice", "Rating", "YesNo"]);
+export const kpiRecordsStatusEnum = pgEnum("kpi_records_status_enum", ["Draft", "Submitted", "Approved", "Rejected"]);
+export const trainingOfferingsStatusEnum = pgEnum("training_offerings_status_enum", ["Planned", "Active", "Completed", "Cancelled"]);
+export const sharedPlannerEventsEventTypeEnum = pgEnum("shared_planner_events_event_type_enum", [
+    "Meeting",
+    "Training",
+    "Deadline",
+    "Reminder",
+    "Visit",
+    "General",
+  ]);
+export const importLogsStatusEnum = pgEnum("import_logs_status_enum", ["Pending", "Processing", "Completed", "Failed"]);
+export const auditLogsStatusEnum = pgEnum("audit_logs_status_enum", ["Success", "Failed"]);
+export const qualityActionsCategoryEnum = pgEnum("quality_actions_category_enum", [
+    "Nonconformance",
+    "Corrective Action",
+    "Observation",
+    "Improvement",
+  ]);
+export const qualityActionsSourceEnum = pgEnum("quality_actions_source_enum", [
+    "Customer Complaint",
+    "Internal Audit",
+    "Supplier",
+    "Training",
+    "Examination",
+    "Level III",
+    "Equipment",
+    "Document Control",
+    "Management Review",
+    "Other",
+  ]);
+export const qualityActionsSeverityEnum = pgEnum("quality_actions_severity_enum", ["Minor", "Major", "Critical"]);
+export const qualityActionsStatusEnum = pgEnum("quality_actions_status_enum", ["Open", "In Progress", "Awaiting Verification", "Closed"]);
+export const qualityAuditsAuditTypeEnum = pgEnum("quality_audits_audit_type_enum", [
+    "Internal Audit",
+    "Process Audit",
+    "Training Audit",
+    "Equipment Audit",
+    "Document Audit",
+    "Branch Audit",
+  ]);
+export const qualityAuditsStatusEnum = pgEnum("quality_audits_status_enum", ["Planned", "In Progress", "Completed", "Cancelled"]);
+export const managementReviewsStatusEnum = pgEnum("management_reviews_status_enum", ["Planned", "Held", "Closed", "Cancelled"]);
+export const externalProvidersProviderTypeEnum = pgEnum("external_providers_provider_type_enum", [
+    "Lecturer",
+    "Assessor",
+    "Calibration",
+    "Consumables",
+    "Venue",
+    "Equipment",
+    "Level III Consultant",
+    "Document / Printing",
+    "Other",
+  ]);
+export const externalProvidersStatusEnum = pgEnum("external_providers_status_enum", [
+    "Approved",
+    "Conditional",
+    "Under Review",
+    "Suspended",
+    "Inactive",
+  ]);
+export const externalProvidersRatingEnum = pgEnum("external_providers_rating_enum", ["Preferred", "Acceptable", "Probationary"]);
+export const notificationsTypeEnum = pgEnum("notifications_type_enum", [
+    "student_added", "lead_status_changed", "attendance_marked",
+    "equipment_maintenance", "specimen_mastered", "kpi_completed",
+    "course_started", "enrollment_confirmed", "system_alert",
+  ]);
+export const notificationsPriorityEnum = pgEnum("notifications_priority_enum", ["low", "normal", "high", "critical"]);
 
 // ---------------------------------------------------------------------------
 // Better Auth tables
@@ -18,17 +124,17 @@ import {
 // expects this exact shape. Your app-specific user data lives in `users`.
 // ---------------------------------------------------------------------------
 
-export const authUsers = mysqlTable("auth_users", {
+export const authUsers = pgTable("auth_users", {
   id:            varchar("id", { length: 36 }).primaryKey(),       // UUID
   name:          varchar("name", { length: 255 }).notNull(),
   email:         varchar("email", { length: 320 }).notNull().unique(),
   emailVerified: boolean("emailVerified").default(false).notNull(),
   image:         text("image"),
   createdAt:     timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:     timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:     timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
-export const authSessions = mysqlTable("auth_sessions", {
+export const authSessions = pgTable("auth_sessions", {
   id:        varchar("id", { length: 36 }).primaryKey(),
   userId:    varchar("userId", { length: 36 }).notNull(),
   token:     varchar("token", { length: 255 }).notNull().unique(),
@@ -36,10 +142,10 @@ export const authSessions = mysqlTable("auth_sessions", {
   ipAddress: varchar("ipAddress", { length: 45 }),
   userAgent: text("userAgent"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
-export const authAccounts = mysqlTable("auth_accounts", {
+export const authAccounts = pgTable("auth_accounts", {
   id:                   varchar("id", { length: 36 }).primaryKey(),
   userId:               varchar("userId", { length: 36 }).notNull(),
   accountId:            varchar("accountId", { length: 255 }).notNull(),
@@ -48,12 +154,12 @@ export const authAccounts = mysqlTable("auth_accounts", {
   refreshToken:         text("refreshToken"),
   accessTokenExpiresAt: timestamp("accessTokenExpiresAt"),
   password:             text("password"),                           // hashed
-  passwordHistory:      json("passwordHistory"),
+  passwordHistory:      jsonb("passwordHistory"),
   createdAt:            timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:            timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:            timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
-export const authVerifications = mysqlTable("auth_verifications", {
+export const authVerifications = pgTable("auth_verifications", {
   id:         varchar("id", { length: 36 }).primaryKey(),
   identifier: varchar("identifier", { length: 255 }).notNull(),
   value:      varchar("value", { length: 255 }).notNull(),
@@ -72,8 +178,8 @@ export type AuthVerification = typeof authVerifications.$inferSelect;
 // (role, branch, lastSignedIn, etc.) that Better Auth doesn't manage.
 // ---------------------------------------------------------------------------
 
-export const users = mysqlTable("users", {
-  id:           int("id").autoincrement().primaryKey(),
+export const users = pgTable("users", {
+  id:           serial("id").primaryKey(),
   authId:       varchar("authId", { length: 36 }).unique(),         // FK → auth_users.id
   name:         text("name"),
   email:        varchar("email", { length: 320 }).unique(),
@@ -81,25 +187,25 @@ export const users = mysqlTable("users", {
   calendarFeedToken: varchar("calendarFeedToken", { length: 64 }).unique(),
   loginEnabled: boolean("loginEnabled").default(true).notNull(),
   mustChangePassword: boolean("mustChangePassword").default(false).notNull(),
-  role:         mysqlEnum("role", ["user", "admin", "super_admin"]).default("user").notNull(),
+  role:         usersRoleEnum("role").default("user").notNull(),
   createdAt:    timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:    timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:    timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
   lastSignedIn: timestamp("lastSignedIn"),
 });
 
 export type User       = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-export const moduleAccess = mysqlTable("module_access", {
-  id:        int("id").autoincrement().primaryKey(),
-  userId:    int("userId").notNull(),
+export const moduleAccess = pgTable("module_access", {
+  id:        serial("id").primaryKey(),
+  userId:    integer("userId").notNull(),
   module:    varchar("module", { length: 100 }).notNull(),
   canView:   boolean("canView").default(false).notNull(),
   canCreate: boolean("canCreate").default(false).notNull(),
   canEdit:   boolean("canEdit").default(false).notNull(),
   canDelete: boolean("canDelete").default(false).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type ModuleAccess = typeof moduleAccess.$inferSelect;
@@ -109,8 +215,8 @@ export type InsertModuleAccess = typeof moduleAccess.$inferInsert;
 // Branches
 // ---------------------------------------------------------------------------
 
-export const branches = mysqlTable("branches", {
-  id:          int("id").autoincrement().primaryKey(),
+export const branches = pgTable("branches", {
+  id:          serial("id").primaryKey(),
   name:        varchar("name", { length: 255 }).notNull().unique(),
   code:        varchar("code", { length: 50 }),
   description: text("description"),
@@ -121,7 +227,7 @@ export const branches = mysqlTable("branches", {
   secondaryColor: varchar("secondaryColor", { length: 7 }),
   active:      boolean("active").default(true).notNull(),
   createdAt:   timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:   timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:   timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type Branch       = typeof branches.$inferSelect;
@@ -131,8 +237,8 @@ export type InsertBranch = typeof branches.$inferInsert;
 // Students
 // ---------------------------------------------------------------------------
 
-export const students = mysqlTable("students", {
-  id:               int("id").autoincrement().primaryKey(),
+export const students = pgTable("students", {
+  id:               serial("id").primaryKey(),
   firstName:        varchar("firstName", { length: 255 }).notNull(),
   lastName:         varchar("lastName", { length: 255 }).notNull(),
   email:            varchar("email", { length: 320 }),
@@ -141,7 +247,7 @@ export const students = mysqlTable("students", {
   passportNumber:   varchar("passportNumber", { length: 50 }),
   studentNumber:    varchar("studentNumber", { length: 50 }),
   dateOfBirth:      date("dateOfBirth"),
-  branchId:         int("branchId"),
+  branchId:         integer("branchId"),
   interestType:     varchar("interestType", { length: 30 }),
   isCurrentPcnHolder: boolean("isCurrentPcnHolder").default(false).notNull(),
   bindtProductCompleted: boolean("bindtProductCompleted").default(false).notNull(),
@@ -150,7 +256,7 @@ export const students = mysqlTable("students", {
   blacklisted:      boolean("blacklisted").default(false).notNull(),
   blacklistReason:  text("blacklistReason"),
   createdAt:        timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:        timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:        timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type Student       = typeof students.$inferSelect;
@@ -160,25 +266,25 @@ export type InsertStudent = typeof students.$inferInsert;
 // Leads
 // ---------------------------------------------------------------------------
 
-export const leads = mysqlTable("leads", {
-  id: int("id").autoincrement().primaryKey(),
+export const leads = pgTable("leads", {
+  id: serial("id").primaryKey(),
   firstName: varchar("first_name", { length: 120 }).notNull(),
   lastName: varchar("last_name", { length: 120 }).notNull(),
   email: varchar("email", { length: 255 }),
   phone: varchar("phone", { length: 50 }),
-  companyId: int("company_id"),
-  contactId: int("contact_id"),
+  companyId: integer("company_id"),
+  contactId: integer("contact_id"),
   companyName: varchar("company_name", { length: 255 }),
   idNumber: varchar("id_number", { length: 50 }),
   passportNumber: varchar("passport_number", { length: 50 }),
   preferredContactMethod: varchar("preferred_contact_method", { length: 30 }),
   methodInterested: varchar("method_interested", { length: 120 }),
-  interestedCourseId: int("interested_course_id"),
+  interestedCourseId: integer("interested_course_id"),
   interestType: varchar("interest_type", { length: 30 }),
   isCurrentPcnHolder: boolean("is_current_pcn_holder").default(false).notNull(),
   bindtProductCompleted: boolean("bindt_product_completed").default(false).notNull(),
   pcnNumber: varchar("pcn_number", { length: 100 }),
-  followUpDate: datetime("follow_up_date"),
+  followUpDate: timestamp("follow_up_date"),
   autoFollowUp: boolean("auto_follow_up").default(false).notNull(),
   status: varchar("status", { length: 30 }).default("New").notNull(),
   statusFlag: varchar("status_flag", { length: 20 }).default("Green").notNull(),
@@ -188,9 +294,9 @@ export const leads = mysqlTable("leads", {
   blacklistReason: text("blacklist_reason"),
   duplicateWarning: boolean("duplicate_warning").default(false).notNull(),
   duplicateNotes: text("duplicate_notes"),
-  branchId: int("branch_id"),
+  branchId: integer("branch_id"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type Lead = typeof leads.$inferSelect;
@@ -200,8 +306,8 @@ export type InsertLead = typeof leads.$inferInsert;
 // CRM Companies, Contacts, and Lead Activity
 // ---------------------------------------------------------------------------
 
-export const companies = mysqlTable("companies", {
-  id: int("id").autoincrement().primaryKey(),
+export const companies = pgTable("companies", {
+  id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   registrationNumber: varchar("registrationNumber", { length: 100 }),
   phone: varchar("phone", { length: 50 }),
@@ -212,18 +318,18 @@ export const companies = mysqlTable("companies", {
   primaryContactEmail: varchar("primaryContactEmail", { length: 320 }),
   primaryContactPhone: varchar("primaryContactPhone", { length: 50 }),
   status: varchar("status", { length: 30 }).default("Active").notNull(),
-  branchId: int("branchId"),
+  branchId: integer("branchId"),
   notes: text("notes"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type Company = typeof companies.$inferSelect;
 export type InsertCompany = typeof companies.$inferInsert;
 
-export const contacts = mysqlTable("contacts", {
-  id: int("id").autoincrement().primaryKey(),
-  companyId: int("companyId"),
+export const contacts = pgTable("contacts", {
+  id: serial("id").primaryKey(),
+  companyId: integer("companyId"),
   firstName: varchar("firstName", { length: 120 }).notNull(),
   lastName: varchar("lastName", { length: 120 }).notNull(),
   email: varchar("email", { length: 320 }),
@@ -233,24 +339,24 @@ export const contacts = mysqlTable("contacts", {
   notes: text("notes"),
   active: boolean("active").default(true).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type Contact = typeof contacts.$inferSelect;
 export type InsertContact = typeof contacts.$inferInsert;
 
-export const leadActivities = mysqlTable("leadActivities", {
-  id: int("id").autoincrement().primaryKey(),
-  leadId: int("leadId").notNull(),
-  userId: int("userId"),
+export const leadActivities = pgTable("leadActivities", {
+  id: serial("id").primaryKey(),
+  leadId: integer("leadId").notNull(),
+  userId: integer("userId"),
   activityType: varchar("activityType", { length: 50 }).default("Note").notNull(),
   subject: varchar("subject", { length: 255 }),
   notes: text("notes"),
-  dueDate: datetime("dueDate"),
+  dueDate: timestamp("dueDate"),
   completed: boolean("completed").default(false).notNull(),
-  completedAt: datetime("completedAt"),
+  completedAt: timestamp("completedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type LeadActivity = typeof leadActivities.$inferSelect;
@@ -260,17 +366,17 @@ export type InsertLeadActivity = typeof leadActivities.$inferInsert;
 // Courses
 // ---------------------------------------------------------------------------
 
-export const courses = mysqlTable("courses", {
-  id:          int("id").autoincrement().primaryKey(),
+export const courses = pgTable("courses", {
+  id:          serial("id").primaryKey(),
   name:        varchar("name", { length: 255 }).notNull(),
   code:        varchar("code", { length: 50 }).notNull().unique(),
   description: text("description"),
-  duration:    int("duration"),
-  level:       mysqlEnum("level", ["Level 1", "Level 2", "Level 3"]).default("Level 1").notNull(),
-  branchId:    int("branchId"),
+  duration:    integer("duration"),
+  level:       coursesLevelEnum("level").default("Level 1").notNull(),
+  branchId:    integer("branchId"),
   active:      boolean("active").default(true).notNull(),
   createdAt:   timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:   timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:   timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type Course       = typeof courses.$inferSelect;
@@ -280,17 +386,17 @@ export type InsertCourse = typeof courses.$inferInsert;
 // Course Schedules
 // ---------------------------------------------------------------------------
 
-export const courseSchedules = mysqlTable("courseSchedules", {
-  id:           int("id").autoincrement().primaryKey(),
-  courseId:     int("courseId").notNull(),
-  startDate:    datetime("startDate").notNull(),
-  endDate:      datetime("endDate").notNull(),
-  endOfCourseExamStartDate: datetime("endOfCourseExamStartDate"),
-  endOfCourseExamEndDate: datetime("endOfCourseExamEndDate"),
-  lecturerId: int("lecturerId"),
-  maxCapacity:  int("maxCapacity"),
-  branchId:     int("branchId"),
-  courseStartPackConfig: json("courseStartPackConfig").$type<{
+export const courseSchedules = pgTable("courseSchedules", {
+  id:           serial("id").primaryKey(),
+  courseId:     integer("courseId").notNull(),
+  startDate:    timestamp("startDate").notNull(),
+  endDate:      timestamp("endDate").notNull(),
+  endOfCourseExamStartDate: timestamp("endOfCourseExamStartDate"),
+  endOfCourseExamEndDate: timestamp("endOfCourseExamEndDate"),
+  lecturerId: integer("lecturerId"),
+  maxCapacity:  integer("maxCapacity"),
+  branchId:     integer("branchId"),
+  courseStartPackConfig: jsonb("courseStartPackConfig").$type<{
     location?: string | null;
     industrySector?: string | null;
     sectorScope?: string | null;
@@ -303,9 +409,9 @@ export const courseSchedules = mysqlTable("courseSchedules", {
     safetyDeclaration?: string | null;
     lecturerNotes?: string | null;
   }>(),
-  status:       mysqlEnum("status", ["Scheduled", "In Progress", "Completed", "Cancelled"]).default("Scheduled").notNull(),
+  status:       courseSchedulesStatusEnum("status").default("Scheduled").notNull(),
   createdAt:    timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:    timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:    timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type CourseSchedule       = typeof courseSchedules.$inferSelect;
@@ -315,14 +421,14 @@ export type InsertCourseSchedule = typeof courseSchedules.$inferInsert;
 // Enrollments
 // ---------------------------------------------------------------------------
 
-export const enrollments = mysqlTable("enrollments", {
-  id:               int("id").autoincrement().primaryKey(),
-  studentId:        int("studentId").notNull(),
-  courseScheduleId: int("courseScheduleId").notNull(),
+export const enrollments = pgTable("enrollments", {
+  id:               serial("id").primaryKey(),
+  studentId:        integer("studentId").notNull(),
+  courseScheduleId: integer("courseScheduleId").notNull(),
   enrollmentDate:   timestamp("enrollmentDate").defaultNow().notNull(),
-  status:           mysqlEnum("status", ["Active", "Completed", "Withdrawn", "Suspended"]).default("Active").notNull(),
+  status:           enrollmentsStatusEnum("status").default("Active").notNull(),
   createdAt:        timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:        timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:        timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type Enrollment       = typeof enrollments.$inferSelect;
@@ -332,15 +438,15 @@ export type InsertEnrollment = typeof enrollments.$inferInsert;
 // Attendance
 // ---------------------------------------------------------------------------
 
-export const attendance = mysqlTable("attendance", {
-  id:               int("id").autoincrement().primaryKey(),
-  enrollmentId:     int("enrollmentId").notNull(),
-  courseScheduleId: int("courseScheduleId").notNull(),
+export const attendance = pgTable("attendance", {
+  id:               serial("id").primaryKey(),
+  enrollmentId:     integer("enrollmentId").notNull(),
+  courseScheduleId: integer("courseScheduleId").notNull(),
   attendanceDate:   date("attendanceDate").notNull(),
-  status:           mysqlEnum("status", ["Present", "Absent", "Late", "Excused"]).default("Present").notNull(),
+  status:           attendanceStatusEnum("status").default("Present").notNull(),
   notes:            text("notes"),
   createdAt:        timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:        timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:        timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type Attendance       = typeof attendance.$inferSelect;
@@ -350,19 +456,19 @@ export type InsertAttendance = typeof attendance.$inferInsert;
 // Assessments
 // ---------------------------------------------------------------------------
 
-export const assessments = mysqlTable("assessments", {
-  id:             int("id").autoincrement().primaryKey(),
-  enrollmentId:   int("enrollmentId").notNull(),
-  assessorId:     int("assessorId"),
-  assessmentType: mysqlEnum("assessmentType", ["Theory", "Practical"]).default("Theory").notNull(),
-  attemptNumber:  int("attemptNumber").default(1).notNull(),
-  score:          decimal("score", { precision: 6, scale: 2 }),
-  maxScore:       decimal("maxScore", { precision: 6, scale: 2 }),
-  result:         mysqlEnum("result", ["Pass", "Fail", "Incomplete"]).default("Incomplete").notNull(),
+export const assessments = pgTable("assessments", {
+  id:             serial("id").primaryKey(),
+  enrollmentId:   integer("enrollmentId").notNull(),
+  assessorId:     integer("assessorId"),
+  assessmentType: assessmentsAssessmentTypeEnum("assessmentType").default("Theory").notNull(),
+  attemptNumber:  integer("attemptNumber").default(1).notNull(),
+  score:          numeric("score", { precision: 6, scale: 2 }),
+  maxScore:       numeric("maxScore", { precision: 6, scale: 2 }),
+  result:         assessmentsResultEnum("result").default("Incomplete").notNull(),
   assessmentDate: date("assessmentDate").notNull(),
   notes:          text("notes"),
   createdAt:      timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:      timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:      timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type Assessment       = typeof assessments.$inferSelect;
@@ -372,18 +478,18 @@ export type InsertAssessment = typeof assessments.$inferInsert;
 // Certificates
 // ---------------------------------------------------------------------------
 
-export const certificates = mysqlTable("certificates", {
-  id:                int("id").autoincrement().primaryKey(),
-  enrollmentId:      int("enrollmentId").notNull(),
+export const certificates = pgTable("certificates", {
+  id:                serial("id").primaryKey(),
+  enrollmentId:      integer("enrollmentId").notNull(),
   certificateNumber: varchar("certificateNumber", { length: 120 }).notNull().unique(),
   issuedDate:        date("issuedDate").notNull(),
   expiryDate:        date("expiryDate"),
-  status:            mysqlEnum("status", ["Active", "Expired", "Revoked"]).default("Active").notNull(),
+  status:            certificatesStatusEnum("status").default("Active").notNull(),
   content:           text("content"),
   notes:             text("notes"),
-  issuedBy:          int("issuedBy"),
+  issuedBy:          integer("issuedBy"),
   createdAt:         timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:         timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:         timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type Certificate = typeof certificates.$inferSelect;
@@ -393,8 +499,8 @@ export type InsertCertificate = typeof certificates.$inferInsert;
 // Level III Services
 // ---------------------------------------------------------------------------
 
-export const levelIIIClients = mysqlTable("levelIIIClients", {
-  id:                int("id").autoincrement().primaryKey(),
+export const levelIIIClients = pgTable("levelIIIClients", {
+  id:                serial("id").primaryKey(),
   companyName:       varchar("companyName", { length: 255 }).notNull(),
   primaryContact:    varchar("primaryContact", { length: 255 }).notNull(),
   secondaryContact:  varchar("secondaryContact", { length: 255 }),
@@ -403,45 +509,45 @@ export const levelIIIClients = mysqlTable("levelIIIClients", {
   phone:             varchar("phone", { length: 50 }).notNull(),
   secondaryPhone:    varchar("secondaryPhone", { length: 50 }),
   physicalAddress:   text("physicalAddress").notNull(),
-  visitCadence:      mysqlEnum("visitCadence", ["Weekly", "Monthly", "Six Monthly"]).default("Monthly").notNull(),
+  visitCadence:      levelIIIClientsVisitCadenceEnum("visitCadence").default("Monthly").notNull(),
   lastVisit:         date("lastVisit"),
   nextVisit:         date("nextVisit"),
   procedureUpdatedAt: date("procedureUpdatedAt"),
   notes:             text("notes"),
   createdAt:         timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:         timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:         timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type LevelIIIClient = typeof levelIIIClients.$inferSelect;
 export type InsertLevelIIIClient = typeof levelIIIClients.$inferInsert;
 
-export const levelIIIActivities = mysqlTable("levelIIIActivities", {
-  id:             int("id").autoincrement().primaryKey(),
-  clientId:       int("clientId").notNull(),
-  activityType:   mysqlEnum("activityType", ["Visit", "Call", "Email", "Assessment", "Procedure Review", "General"]).default("General").notNull(),
+export const levelIIIActivities = pgTable("levelIIIActivities", {
+  id:             serial("id").primaryKey(),
+  clientId:       integer("clientId").notNull(),
+  activityType:   levelIIIActivitiesActivityTypeEnum("activityType").default("General").notNull(),
   subject:        varchar("subject", { length: 255 }).notNull(),
   activityDate:   date("activityDate").notNull(),
   nextActionDate: date("nextActionDate"),
-  status:         mysqlEnum("status", ["Planned", "Completed", "Cancelled"]).default("Planned").notNull(),
+  status:         levelIIIActivitiesStatusEnum("status").default("Planned").notNull(),
   notes:          text("notes"),
   createdAt:      timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:      timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:      timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type LevelIIIActivity = typeof levelIIIActivities.$inferSelect;
 export type InsertLevelIIIActivity = typeof levelIIIActivities.$inferInsert;
 
-export const levelIIITechnicians = mysqlTable("levelIIITechnicians", {
-  id:               int("id").autoincrement().primaryKey(),
-  clientId:         int("clientId").notNull(),
-  clientBranchId:   int("clientBranchId"),
+export const levelIIITechnicians = pgTable("levelIIITechnicians", {
+  id:               serial("id").primaryKey(),
+  clientId:         integer("clientId").notNull(),
+  clientBranchId:   integer("clientBranchId"),
   name:             varchar("name", { length: 255 }).notNull(),
   email:            varchar("email", { length: 320 }).notNull(),
   phone:            varchar("phone", { length: 50 }),
   method:           varchar("method", { length: 255 }).notNull(),
-  methods:          json("methods").$type<string[]>(),
+  methods:          jsonb("methods").$type<string[]>(),
   level:            varchar("level", { length: 100 }).notNull(),
-  methodQualifications: json("methodQualifications").$type<Array<{ method: string; level: string }>>(),
+  methodQualifications: jsonb("methodQualifications").$type<Array<{ method: string; level: string }>>(),
   hasPcnQualification: boolean("hasPcnQualification").default(false).notNull(),
   certificateNumber: varchar("certificateNumber", { length: 120 }),
   procedureStatus:  varchar("procedureStatus", { length: 255 }),
@@ -450,62 +556,62 @@ export const levelIIITechnicians = mysqlTable("levelIIITechnicians", {
   eyeTestValidUntil: date("eyeTestValidUntil"),
   notes:            text("notes"),
   createdAt:        timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:        timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:        timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type LevelIIITechnician = typeof levelIIITechnicians.$inferSelect;
 export type InsertLevelIIITechnician = typeof levelIIITechnicians.$inferInsert;
 
-export const levelIIITechnicianCertificates = mysqlTable("levelIIITechnicianCertificates", {
-  id:               int("id").autoincrement().primaryKey(),
-  technicianId:     int("technicianId").notNull(),
-  assessmentId:     int("assessmentId"),
-  clientId:         int("clientId").notNull(),
-  clientBranchId:   int("clientBranchId"),
+export const levelIIITechnicianCertificates = pgTable("levelIIITechnicianCertificates", {
+  id:               serial("id").primaryKey(),
+  technicianId:     integer("technicianId").notNull(),
+  assessmentId:     integer("assessmentId"),
+  clientId:         integer("clientId").notNull(),
+  clientBranchId:   integer("clientBranchId"),
   certificateNumber: varchar("certificateNumber", { length: 120 }).notNull().unique(),
   method:           varchar("method", { length: 255 }).notNull(),
   level:            varchar("level", { length: 100 }).notNull(),
-  methodLevels:     json("methodLevels").$type<Array<{ method: string; level: string }>>(),
+  methodLevels:     jsonb("methodLevels").$type<Array<{ method: string; level: string }>>(),
   issuedDate:       date("issuedDate").notNull(),
   validUntil:       date("validUntil"),
-  validityValue:    int("validityValue"),
-  validityUnit:     mysqlEnum("validityUnit", ["days", "months", "years", "custom"]),
-  status:           mysqlEnum("status", ["Active", "Expired", "Revoked", "Superseded"]).default("Active").notNull(),
+  validityValue:    integer("validityValue"),
+  validityUnit:     levelIIITechnicianCertificatesValidityUnitEnum("validityUnit"),
+  status:           levelIIITechnicianCertificatesStatusEnum("status").default("Active").notNull(),
   fileName:         varchar("fileName", { length: 255 }),
   fileUrl:          text("fileUrl"),
   fileKey:          varchar("fileKey", { length: 500 }),
   contentType:      varchar("contentType", { length: 255 }),
   sourceFileName:   varchar("sourceFileName", { length: 255 }),
   sourcePath:       text("sourcePath"),
-  approvalStatus:   mysqlEnum("approvalStatus", ["draft", "in_review", "approved", "rejected"]).default("draft").notNull(),
+  approvalStatus:   levelIIITechnicianCertificatesApprovalStatusEnum("approvalStatus").default("draft").notNull(),
   approvalRequestedAt: timestamp("approvalRequestedAt"),
-  approvalRequestedBy: int("approvalRequestedBy"),
+  approvalRequestedBy: integer("approvalRequestedBy"),
   approvedAt:       timestamp("approvedAt"),
-  approvedBy:       int("approvedBy"),
+  approvedBy:       integer("approvedBy"),
   approvalNote:     text("approvalNote"),
   notes:            text("notes"),
-  issuedBy:         int("issuedBy"),
+  issuedBy:         integer("issuedBy"),
   createdAt:        timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:        timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:        timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type LevelIIITechnicianCertificate = typeof levelIIITechnicianCertificates.$inferSelect;
 export type InsertLevelIIITechnicianCertificate = typeof levelIIITechnicianCertificates.$inferInsert;
 
-export const levelIIITechnicianCertificateExports = mysqlTable(
+export const levelIIITechnicianCertificateExports = pgTable(
   "levelIIITechnicianCertificateExports",
   {
-    id: int("id").autoincrement().primaryKey(),
-    certificateId: int("certificateId").notNull(),
-    technicianId: int("technicianId").notNull(),
-    clientId: int("clientId").notNull(),
-    exportFormat: mysqlEnum("exportFormat", ["html", "pdf"]).notNull(),
+    id: serial("id").primaryKey(),
+    certificateId: integer("certificateId").notNull(),
+    technicianId: integer("technicianId").notNull(),
+    clientId: integer("clientId").notNull(),
+    exportFormat: levelIIITechnicianCertificateExportsExportFormatEnum("exportFormat").notNull(),
     fileName: varchar("fileName", { length: 255 }).notNull(),
     title: varchar("title", { length: 255 }),
     subtitle: text("subtitle"),
-    artifactSummary: json("artifactSummary").$type<Record<string, string | null> | null>(),
-    artifactPayload: json("artifactPayload").$type<Record<string, unknown> | null>(),
-    exportedByUserId: int("exportedByUserId"),
+    artifactSummary: jsonb("artifactSummary").$type<Record<string, string | null> | null>(),
+    artifactPayload: jsonb("artifactPayload").$type<Record<string, unknown> | null>(),
+    exportedByUserId: integer("exportedByUserId"),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
   }
 );
@@ -515,96 +621,96 @@ export type LevelIIITechnicianCertificateExport =
 export type InsertLevelIIITechnicianCertificateExport =
   typeof levelIIITechnicianCertificateExports.$inferInsert;
 
-export const portalClientUsers = mysqlTable("portalClientUsers", {
-  id:           int("id").autoincrement().primaryKey(),
-  clientId:     int("clientId").notNull(),
-  userId:       int("userId").notNull(),
-  accessLevel:  mysqlEnum("accessLevel", ["viewer", "editor", "manager"]).default("viewer").notNull(),
+export const portalClientUsers = pgTable("portalClientUsers", {
+  id:           serial("id").primaryKey(),
+  clientId:     integer("clientId").notNull(),
+  userId:       integer("userId").notNull(),
+  accessLevel:  portalClientUsersAccessLevelEnum("accessLevel").default("viewer").notNull(),
   receiveReminders: boolean("receiveReminders").default(true).notNull(),
   createdAt:    timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:    timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:    timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type PortalClientUser = typeof portalClientUsers.$inferSelect;
 export type InsertPortalClientUser = typeof portalClientUsers.$inferInsert;
 
-export const portalClientReminderSettings = mysqlTable("portalClientReminderSettings", {
-  id:           int("id").autoincrement().primaryKey(),
-  clientId:     int("clientId").notNull(),
+export const portalClientReminderSettings = pgTable("portalClientReminderSettings", {
+  id:           serial("id").primaryKey(),
+  clientId:     integer("clientId").notNull(),
   complianceEnabled: boolean("complianceEnabled").default(true).notNull(),
   documentEnabled: boolean("documentEnabled").default(true).notNull(),
   includeMissingRequired: boolean("includeMissingRequired").default(true).notNull(),
   includePendingReview: boolean("includePendingReview").default(true).notNull(),
-  documentLeadDays: int("documentLeadDays").default(14).notNull(),
-  complianceEscalationDays: int("complianceEscalationDays").default(14).notNull(),
-  documentEscalationDays: int("documentEscalationDays").default(7).notNull(),
+  documentLeadDays: integer("documentLeadDays").default(14).notNull(),
+  complianceEscalationDays: integer("complianceEscalationDays").default(14).notNull(),
+  documentEscalationDays: integer("documentEscalationDays").default(7).notNull(),
   sendToAssignedUsers: boolean("sendToAssignedUsers").default(true).notNull(),
   sendToInternalAdmins: boolean("sendToInternalAdmins").default(true).notNull(),
   escalationManagersOnly: boolean("escalationManagersOnly").default(true).notNull(),
-  allowedClientDocumentLabels: json("allowedClientDocumentLabels"),
+  allowedClientDocumentLabels: jsonb("allowedClientDocumentLabels"),
   createdAt:    timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:    timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:    timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type PortalClientReminderSetting = typeof portalClientReminderSettings.$inferSelect;
 export type InsertPortalClientReminderSetting = typeof portalClientReminderSettings.$inferInsert;
 
-export const portalRequirementDefinitions = mysqlTable("portalRequirementDefinitions", {
-  id:           int("id").autoincrement().primaryKey(),
-  clientId:     int("clientId").notNull(),
+export const portalRequirementDefinitions = pgTable("portalRequirementDefinitions", {
+  id:           serial("id").primaryKey(),
+  clientId:     integer("clientId").notNull(),
   name:         varchar("name", { length: 255 }).notNull(),
   category:     varchar("category", { length: 100 }).default("General").notNull(),
   description:  text("description"),
-  validityDays: int("validityDays"),
-  reminderDays: int("reminderDays").default(30).notNull(),
+  validityDays: integer("validityDays"),
+  reminderDays: integer("reminderDays").default(30).notNull(),
   isRequired:   boolean("isRequired").default(true).notNull(),
   active:       boolean("active").default(true).notNull(),
-  sortOrder:    int("sortOrder").default(0).notNull(),
-  customFields: json("customFields"),
+  sortOrder:    integer("sortOrder").default(0).notNull(),
+  customFields: jsonb("customFields"),
   createdAt:    timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:    timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:    timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type PortalRequirementDefinition = typeof portalRequirementDefinitions.$inferSelect;
 export type InsertPortalRequirementDefinition = typeof portalRequirementDefinitions.$inferInsert;
 
-export const portalTechnicianRequirements = mysqlTable("portalTechnicianRequirements", {
-  id:           int("id").autoincrement().primaryKey(),
-  technicianId: int("technicianId").notNull(),
-  definitionId: int("definitionId").notNull(),
-  status:       mysqlEnum("status", ["missing", "current", "no_expiry", "expiring", "expired", "pending_review"]).default("missing").notNull(),
+export const portalTechnicianRequirements = pgTable("portalTechnicianRequirements", {
+  id:           serial("id").primaryKey(),
+  technicianId: integer("technicianId").notNull(),
+  definitionId: integer("definitionId").notNull(),
+  status:       portalTechnicianRequirementsStatusEnum("status").default("missing").notNull(),
   issuedAt:     date("issuedAt"),
   validUntil:   date("validUntil"),
   notes:        text("notes"),
-  customFieldValues: json("customFieldValues"),
-  uploadedByUserId: int("uploadedByUserId"),
+  customFieldValues: jsonb("customFieldValues"),
+  uploadedByUserId: integer("uploadedByUserId"),
   createdAt:    timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:    timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:    timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type PortalTechnicianRequirement = typeof portalTechnicianRequirements.$inferSelect;
 export type InsertPortalTechnicianRequirement = typeof portalTechnicianRequirements.$inferInsert;
 
-export const portalRequirementDocuments = mysqlTable("portalRequirementDocuments", {
-  id:           int("id").autoincrement().primaryKey(),
-  technicianRequirementId: int("technicianRequirementId").notNull(),
+export const portalRequirementDocuments = pgTable("portalRequirementDocuments", {
+  id:           serial("id").primaryKey(),
+  technicianRequirementId: integer("technicianRequirementId").notNull(),
   fileName:     varchar("fileName", { length: 255 }).notNull(),
   fileUrl:      text("fileUrl").notNull(),
   fileKey:      varchar("fileKey", { length: 500 }).notNull(),
   contentType:  varchar("contentType", { length: 255 }),
-  uploadedByUserId: int("uploadedByUserId"),
+  uploadedByUserId: integer("uploadedByUserId"),
   createdAt:    timestamp("createdAt").defaultNow().notNull(),
 });
 
 export type PortalRequirementDocument = typeof portalRequirementDocuments.$inferSelect;
 export type InsertPortalRequirementDocument = typeof portalRequirementDocuments.$inferInsert;
 
-export const portalRequirementSourceReferences = mysqlTable("portalRequirementSourceReferences", {
-  id:           int("id").autoincrement().primaryKey(),
-  technicianRequirementId: int("technicianRequirementId").notNull(),
+export const portalRequirementSourceReferences = pgTable("portalRequirementSourceReferences", {
+  id:           serial("id").primaryKey(),
+  technicianRequirementId: integer("technicianRequirementId").notNull(),
   sourceFileName: varchar("sourceFileName", { length: 255 }).notNull(),
   sourcePath:   text("sourcePath").notNull(),
-  importedByUserId: int("importedByUserId"),
+  importedByUserId: integer("importedByUserId"),
   createdAt:    timestamp("createdAt").defaultNow().notNull(),
 });
 
@@ -613,10 +719,10 @@ export type PortalRequirementSourceReference =
 export type InsertPortalRequirementSourceReference =
   typeof portalRequirementSourceReferences.$inferInsert;
 
-export const portalClientDocuments = mysqlTable("portalClientDocuments", {
-  id:           int("id").autoincrement().primaryKey(),
-  clientId:     int("clientId").notNull(),
-  clientBranchId: int("clientBranchId"),
+export const portalClientDocuments = pgTable("portalClientDocuments", {
+  id:           serial("id").primaryKey(),
+  clientId:     integer("clientId").notNull(),
+  clientBranchId: integer("clientBranchId"),
   title:        varchar("title", { length: 255 }).notNull(),
   category:     varchar("category", { length: 120 }).default("General").notNull(),
   description:  text("description"),
@@ -628,184 +734,184 @@ export const portalClientDocuments = mysqlTable("portalClientDocuments", {
   sourcePath:   text("sourcePath"),
   reviewDate:   date("reviewDate"),
   validUntil:   date("validUntil"),
-  status:       mysqlEnum("status", ["active", "archived", "superseded"]).default("active").notNull(),
-  uploadedByUserId: int("uploadedByUserId"),
+  status:       portalClientDocumentsStatusEnum("status").default("active").notNull(),
+  uploadedByUserId: integer("uploadedByUserId"),
   createdAt:    timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:    timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:    timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type PortalClientDocument = typeof portalClientDocuments.$inferSelect;
 export type InsertPortalClientDocument = typeof portalClientDocuments.$inferInsert;
 
-export const portalClientComments = mysqlTable("portalClientComments", {
-  id:           int("id").autoincrement().primaryKey(),
-  clientId:     int("clientId").notNull(),
-  userId:       int("userId").notNull(),
-  requestType:  mysqlEnum("requestType", ["general_comment", "contact_request", "suggestion"]).default("general_comment").notNull(),
+export const portalClientComments = pgTable("portalClientComments", {
+  id:           serial("id").primaryKey(),
+  clientId:     integer("clientId").notNull(),
+  userId:       integer("userId").notNull(),
+  requestType:  portalClientCommentsRequestTypeEnum("requestType").default("general_comment").notNull(),
   subject:      varchar("subject", { length: 255 }).notNull(),
   message:      text("message").notNull(),
-  status:       mysqlEnum("status", ["open", "acknowledged", "closed"]).default("open").notNull(),
+  status:       portalClientCommentsStatusEnum("status").default("open").notNull(),
   internalNotes: text("internalNotes"),
   createdAt:    timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:    timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:    timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type PortalClientComment = typeof portalClientComments.$inferSelect;
 export type InsertPortalClientComment = typeof portalClientComments.$inferInsert;
 
-export const portalClientResources = mysqlTable("portalClientResources", {
-  id:           int("id").autoincrement().primaryKey(),
-  clientId:     int("clientId").notNull(),
-  clientBranchId: int("clientBranchId"),
+export const portalClientResources = pgTable("portalClientResources", {
+  id:           serial("id").primaryKey(),
+  clientId:     integer("clientId").notNull(),
+  clientBranchId: integer("clientBranchId"),
   title:        varchar("title", { length: 255 }).notNull(),
   category:     varchar("category", { length: 120 }).default("General").notNull(),
   description:  text("description"),
-  resourceType: mysqlEnum("resourceType", ["file", "link"]).default("file").notNull(),
+  resourceType: portalClientResourcesResourceTypeEnum("resourceType").default("file").notNull(),
   linkUrl:      text("linkUrl"),
   fileName:     varchar("fileName", { length: 255 }),
   fileUrl:      text("fileUrl"),
   fileKey:      varchar("fileKey", { length: 500 }),
   contentType:  varchar("contentType", { length: 255 }),
-  sortOrder:    int("sortOrder").default(0).notNull(),
+  sortOrder:    integer("sortOrder").default(0).notNull(),
   active:       boolean("active").default(true).notNull(),
-  uploadedByUserId: int("uploadedByUserId"),
+  uploadedByUserId: integer("uploadedByUserId"),
   createdAt:    timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:    timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:    timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type PortalClientResource = typeof portalClientResources.$inferSelect;
 export type InsertPortalClientResource = typeof portalClientResources.$inferInsert;
 
-export const portalApprovalRequests = mysqlTable("portalApprovalRequests", {
-  id:           int("id").autoincrement().primaryKey(),
-  clientId:     int("clientId").notNull(),
-  entityType:   mysqlEnum("entityType", ["technician", "requirement_record", "client_document", "resource"]).notNull(),
-  action:       mysqlEnum("action", ["create", "update", "delete", "upsert"]).notNull(),
-  entityId:     int("entityId"),
+export const portalApprovalRequests = pgTable("portalApprovalRequests", {
+  id:           serial("id").primaryKey(),
+  clientId:     integer("clientId").notNull(),
+  entityType:   portalApprovalRequestsEntityTypeEnum("entityType").notNull(),
+  action:       portalApprovalRequestsActionEnum("action").notNull(),
+  entityId:     integer("entityId"),
   summary:      varchar("summary", { length: 255 }).notNull(),
-  payload:      json("payload"),
-  status:       mysqlEnum("status", ["pending", "approved", "rejected"]).default("pending").notNull(),
-  submittedByUserId: int("submittedByUserId").notNull(),
-  reviewedByUserId: int("reviewedByUserId"),
+  payload:      jsonb("payload"),
+  status:       portalApprovalRequestsStatusEnum("status").default("pending").notNull(),
+  submittedByUserId: integer("submittedByUserId").notNull(),
+  reviewedByUserId: integer("reviewedByUserId"),
   reviewNotes:  text("reviewNotes"),
   reviewedAt:   timestamp("reviewedAt"),
   createdAt:    timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:    timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:    timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type PortalApprovalRequest = typeof portalApprovalRequests.$inferSelect;
 export type InsertPortalApprovalRequest = typeof portalApprovalRequests.$inferInsert;
 
-export const portalClientBranches = mysqlTable("portalClientBranches", {
-  id:           int("id").autoincrement().primaryKey(),
-  clientId:     int("clientId").notNull(),
-  sourceClientId: int("sourceClientId"),
+export const portalClientBranches = pgTable("portalClientBranches", {
+  id:           serial("id").primaryKey(),
+  clientId:     integer("clientId").notNull(),
+  sourceClientId: integer("sourceClientId"),
   name:         varchar("name", { length: 255 }).notNull(),
   code:         varchar("code", { length: 80 }),
   description:  text("description"),
   active:       boolean("active").default(true).notNull(),
-  sortOrder:    int("sortOrder").default(0).notNull(),
+  sortOrder:    integer("sortOrder").default(0).notNull(),
   createdAt:    timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:    timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:    timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type PortalClientBranch = typeof portalClientBranches.$inferSelect;
 export type InsertPortalClientBranch = typeof portalClientBranches.$inferInsert;
 
-export const portalClientUserBranches = mysqlTable("portalClientUserBranches", {
-  id:           int("id").autoincrement().primaryKey(),
-  clientId:     int("clientId").notNull(),
-  userId:       int("userId").notNull(),
-  branchId:     int("branchId").notNull(),
+export const portalClientUserBranches = pgTable("portalClientUserBranches", {
+  id:           serial("id").primaryKey(),
+  clientId:     integer("clientId").notNull(),
+  userId:       integer("userId").notNull(),
+  branchId:     integer("branchId").notNull(),
   createdAt:    timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:    timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:    timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type PortalClientUserBranch = typeof portalClientUserBranches.$inferSelect;
 export type InsertPortalClientUserBranch = typeof portalClientUserBranches.$inferInsert;
 
-export const portalServiceDefinitions = mysqlTable("portalServiceDefinitions", {
-  id:           int("id").autoincrement().primaryKey(),
-  clientId:     int("clientId").notNull(),
+export const portalServiceDefinitions = pgTable("portalServiceDefinitions", {
+  id:           serial("id").primaryKey(),
+  clientId:     integer("clientId").notNull(),
   title:        varchar("title", { length: 255 }).notNull(),
   category:     varchar("category", { length: 120 }).default("General").notNull(),
   description:  text("description"),
   instructions: text("instructions"),
   active:       boolean("active").default(true).notNull(),
-  sortOrder:    int("sortOrder").default(0).notNull(),
-  config:       json("config"),
+  sortOrder:    integer("sortOrder").default(0).notNull(),
+  config:       jsonb("config"),
   createdAt:    timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:    timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:    timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type PortalServiceDefinition = typeof portalServiceDefinitions.$inferSelect;
 export type InsertPortalServiceDefinition = typeof portalServiceDefinitions.$inferInsert;
 
-export const portalServiceRequests = mysqlTable("portalServiceRequests", {
-  id:             int("id").autoincrement().primaryKey(),
-  clientId:       int("clientId").notNull(),
-  clientBranchId: int("clientBranchId"),
-  serviceDefinitionId: int("serviceDefinitionId"),
-  userId:         int("userId").notNull(),
-  technicianId:   int("technicianId"),
+export const portalServiceRequests = pgTable("portalServiceRequests", {
+  id:             serial("id").primaryKey(),
+  clientId:       integer("clientId").notNull(),
+  clientBranchId: integer("clientBranchId"),
+  serviceDefinitionId: integer("serviceDefinitionId"),
+  userId:         integer("userId").notNull(),
+  technicianId:   integer("technicianId"),
   title:          varchar("title", { length: 255 }).notNull(),
   requestType:    varchar("requestType", { length: 120 }).notNull(),
   status:         varchar("status", { length: 80 }).default("submitted").notNull(),
   preferredDate:  date("preferredDate"),
-  techniques:     json("techniques"),
+  techniques:     jsonb("techniques"),
   details:        text("details"),
-  requestedDocuments: json("requestedDocuments"),
+  requestedDocuments: jsonb("requestedDocuments"),
   internalNotes:  text("internalNotes"),
-  metadata:       json("metadata"),
+  metadata:       jsonb("metadata"),
   createdAt:      timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:      timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:      timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type PortalServiceRequest = typeof portalServiceRequests.$inferSelect;
 export type InsertPortalServiceRequest = typeof portalServiceRequests.$inferInsert;
 
-export const portalAssessmentGuides = mysqlTable("portalAssessmentGuides", {
-  id:             int("id").autoincrement().primaryKey(),
-  clientId:       int("clientId").notNull(),
-  clientBranchId: int("clientBranchId"),
+export const portalAssessmentGuides = pgTable("portalAssessmentGuides", {
+  id:             serial("id").primaryKey(),
+  clientId:       integer("clientId").notNull(),
+  clientBranchId: integer("clientBranchId"),
   title:          varchar("title", { length: 255 }).notNull(),
   techniqueName:  varchar("techniqueName", { length: 255 }).notNull(),
   description:    text("description"),
-  bringItems:     json("bringItems"),
-  companyItems:   json("companyItems"),
+  bringItems:     jsonb("bringItems"),
+  companyItems:   jsonb("companyItems"),
   active:         boolean("active").default(true).notNull(),
-  sortOrder:      int("sortOrder").default(0).notNull(),
+  sortOrder:      integer("sortOrder").default(0).notNull(),
   createdAt:      timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:      timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:      timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type PortalAssessmentGuide = typeof portalAssessmentGuides.$inferSelect;
 export type InsertPortalAssessmentGuide = typeof portalAssessmentGuides.$inferInsert;
 
-export const levelIIIAssessments = mysqlTable("levelIIIAssessments", {
-  id:             int("id").autoincrement().primaryKey(),
-  technicianId:   int("technicianId").notNull(),
+export const levelIIIAssessments = pgTable("levelIIIAssessments", {
+  id:             serial("id").primaryKey(),
+  technicianId:   integer("technicianId").notNull(),
   assessmentDate: date("assessmentDate").notNull(),
   method:         varchar("method", { length: 255 }).notNull(),
   level:          varchar("level", { length: 100 }).notNull(),
-  methodLevels:   json("methodLevels").$type<Array<{ method: string; level: string }>>(),
+  methodLevels:   jsonb("methodLevels").$type<Array<{ method: string; level: string }>>(),
   assessor:       varchar("assessor", { length: 255 }).notNull(),
-  result:         mysqlEnum("result", ["Pass", "Fail", "Observation", "Pending Review"]).default("Pending Review").notNull(),
+  result:         levelIIIAssessmentsResultEnum("result").default("Pending Review").notNull(),
   nextReviewDate: date("nextReviewDate"),
   evidenceUrl:    text("evidenceUrl"),
   notes:          text("notes"),
   createdAt:      timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:      timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:      timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type LevelIIIAssessment = typeof levelIIIAssessments.$inferSelect;
 export type InsertLevelIIIAssessment = typeof levelIIIAssessments.$inferInsert;
 
-export const levelIIIEquipment = mysqlTable("levelIIIEquipment", {
-  id:                      int("id").autoincrement().primaryKey(),
+export const levelIIIEquipment = pgTable("levelIIIEquipment", {
+  id:                      serial("id").primaryKey(),
   name:                    varchar("name", { length: 255 }).notNull(),
   serialNumber:            varchar("serialNumber", { length: 100 }).notNull(),
-  status:                  mysqlEnum("status", ["Available", "In Service", "Calibration Due", "Out of Service"]).default("Available").notNull(),
+  status:                  levelIIIEquipmentStatusEnum("status").default("Available").notNull(),
   sharedWithMainEquipment: boolean("sharedWithMainEquipment").default(false).notNull(),
   owner:                   varchar("owner", { length: 255 }).notNull(),
   calibrationType:         varchar("calibrationType", { length: 100 }),
@@ -813,23 +919,23 @@ export const levelIIIEquipment = mysqlTable("levelIIIEquipment", {
   nextDueDate:             date("nextDueDate"),
   notes:                   text("notes"),
   createdAt:               timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:               timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:               timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type LevelIIIEquipment = typeof levelIIIEquipment.$inferSelect;
 export type InsertLevelIIIEquipment = typeof levelIIIEquipment.$inferInsert;
 
-export const levelIIISpecimens = mysqlTable("levelIIISpecimens", {
-  id:                      int("id").autoincrement().primaryKey(),
+export const levelIIISpecimens = pgTable("levelIIISpecimens", {
+  id:                      serial("id").primaryKey(),
   specimenNumber:          varchar("specimenNumber", { length: 100 }).notNull(),
   name:                    varchar("name", { length: 255 }).notNull(),
   specimenType:            varchar("specimenType", { length: 255 }).notNull(),
-  status:                  mysqlEnum("status", ["Available", "In Use", "Shared", "Retired"]).default("Available").notNull(),
+  status:                  levelIIISpecimensStatusEnum("status").default("Available").notNull(),
   sharedWithMainSpecimens: boolean("sharedWithMainSpecimens").default(false).notNull(),
-  masteringStatus:         mysqlEnum("masteringStatus", ["Mastered", "Re-master Required", "Pending"]).default("Pending").notNull(),
+  masteringStatus:         levelIIISpecimensMasteringStatusEnum("masteringStatus").default("Pending").notNull(),
   notes:                   text("notes"),
   createdAt:               timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:               timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:               timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type LevelIIISpecimen = typeof levelIIISpecimens.$inferSelect;
@@ -839,8 +945,8 @@ export type InsertLevelIIISpecimen = typeof levelIIISpecimens.$inferInsert;
 // Equipment
 // ---------------------------------------------------------------------------
 
-export const equipment = mysqlTable("equipment", {
-  id:                 int("id").autoincrement().primaryKey(),
+export const equipment = pgTable("equipment", {
+  id:                 serial("id").primaryKey(),
   name:               varchar("name", { length: 255 }).notNull(),
   serialNumber:       varchar("serialNumber", { length: 100 }),
   make:               varchar("make", { length: 255 }),
@@ -848,15 +954,15 @@ export const equipment = mysqlTable("equipment", {
   description:        text("description"),
   domain:             varchar("domain", { length: 100 }),
   calibrationType:    varchar("calibrationType", { length: 100 }),
-  intervalMonths:     int("intervalMonths"),
+  intervalMonths:     integer("intervalMonths"),
   lastServiceDate:    date("lastServiceDate"),
   nextDueDate:        date("nextDueDate"),
-  status:             mysqlEnum("status", ["Active", "Inactive", "Maintenance", "Retired"]).default("Active").notNull(),
-  escalationLevel:    int("escalationLevel").default(0).notNull(),
+  status:             equipmentStatusEnum("status").default("Active").notNull(),
+  escalationLevel:    integer("escalationLevel").default(0).notNull(),
   lastEscalationDate: timestamp("lastEscalationDate"),
-  branchId:           int("branchId"),
+  branchId:           integer("branchId"),
   createdAt:          timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:          timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:          timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type Equipment       = typeof equipment.$inferSelect;
@@ -866,31 +972,31 @@ export type InsertEquipment = typeof equipment.$inferInsert;
 // Equipment Documents
 // ---------------------------------------------------------------------------
 
-export const equipmentDocuments = mysqlTable("equipmentDocuments", {
-  id:           int("id").autoincrement().primaryKey(),
-  equipmentId:  int("equipmentId").notNull(),
+export const equipmentDocuments = pgTable("equipmentDocuments", {
+  id:           serial("id").primaryKey(),
+  equipmentId:  integer("equipmentId").notNull(),
   label:        varchar("label", { length: 255 }).notNull(),
-  documentType: mysqlEnum("documentType", ["Manual", "Certificate", "Specification", "Maintenance Log", "Other"]).default("Other").notNull(),
+  documentType: equipmentDocumentsDocumentTypeEnum("documentType").default("Other").notNull(),
   url:          text("url").notNull(),
   uploadedAt:   timestamp("uploadedAt").defaultNow().notNull(),
   createdAt:    timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:    timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:    timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type EquipmentDocument       = typeof equipmentDocuments.$inferSelect;
 export type InsertEquipmentDocument = typeof equipmentDocuments.$inferInsert;
 
-export const equipmentLoans = mysqlTable("equipmentLoans", {
-  id:                 int("id").autoincrement().primaryKey(),
-  equipmentId:        int("equipmentId").notNull(),
-  fromBranchId:       int("fromBranchId").notNull(),
-  toBranchId:         int("toBranchId").notNull(),
+export const equipmentLoans = pgTable("equipmentLoans", {
+  id:                 serial("id").primaryKey(),
+  equipmentId:        integer("equipmentId").notNull(),
+  fromBranchId:       integer("fromBranchId").notNull(),
+  toBranchId:         integer("toBranchId").notNull(),
   loanDate:           date("loanDate").notNull(),
   expectedReturnDate: date("expectedReturnDate"),
-  returnedAt:         datetime("returnedAt"),
+  returnedAt:         timestamp("returnedAt"),
   notes:              text("notes"),
   createdAt:          timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:          timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:          timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type EquipmentLoan = typeof equipmentLoans.$inferSelect;
@@ -900,15 +1006,15 @@ export type InsertEquipmentLoan = typeof equipmentLoans.$inferInsert;
 // Specimen Types
 // ---------------------------------------------------------------------------
 
-export const specimenTypes = mysqlTable("specimenTypes", {
-  id:          int("id").autoincrement().primaryKey(),
+export const specimenTypes = pgTable("specimenTypes", {
+  id:          serial("id").primaryKey(),
   name:        varchar("name", { length: 255 }).notNull().unique(),
   material:    varchar("material", { length: 255 }),
   size:        varchar("size", { length: 255 }),
   weight:      varchar("weight", { length: 255 }),
   description: text("description"),
   createdAt:   timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:   timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:   timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type SpecimenType       = typeof specimenTypes.$inferSelect;
@@ -918,17 +1024,17 @@ export type InsertSpecimenType = typeof specimenTypes.$inferInsert;
 // Specimens
 // ---------------------------------------------------------------------------
 
-export const specimens = mysqlTable("specimens", {
-  id:              int("id").autoincrement().primaryKey(),
+export const specimens = pgTable("specimens", {
+  id:              serial("id").primaryKey(),
   name:            varchar("name", { length: 255 }).notNull(),
-  specimenTypeId:  int("specimenTypeId").notNull(),
+  specimenTypeId:  integer("specimenTypeId").notNull(),
   serialNumber:    varchar("serialNumber", { length: 100 }),
   description:     text("description"),
-  status:          mysqlEnum("status", ["Available", "In Use", "Loaned Out", "Quarantine", "Retired"]).default("Available").notNull(),
-  masteringStatus: mysqlEnum("masteringStatus", ["Mastered", "Re-master Required", "Pending"]).default("Pending").notNull(),
-  branchId:        int("branchId"),
+  status:          specimensStatusEnum("status").default("Available").notNull(),
+  masteringStatus: specimensMasteringStatusEnum("masteringStatus").default("Pending").notNull(),
+  branchId:        integer("branchId"),
   createdAt:       timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:       timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:       timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type Specimen       = typeof specimens.$inferSelect;
@@ -938,30 +1044,30 @@ export type InsertSpecimen = typeof specimens.$inferInsert;
 // Specimen Documents
 // ---------------------------------------------------------------------------
 
-export const specimenDocuments = mysqlTable("specimenDocuments", {
-  id:          int("id").autoincrement().primaryKey(),
-  specimenId:  int("specimenId").notNull(),
+export const specimenDocuments = pgTable("specimenDocuments", {
+  id:          serial("id").primaryKey(),
+  specimenId:  integer("specimenId").notNull(),
   label:       varchar("label", { length: 255 }).notNull(),
   url:         text("url").notNull(),
   uploadedAt:  timestamp("uploadedAt").defaultNow().notNull(),
   createdAt:   timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:   timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:   timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type SpecimenDocument       = typeof specimenDocuments.$inferSelect;
 export type InsertSpecimenDocument = typeof specimenDocuments.$inferInsert;
 
-export const specimenLoans = mysqlTable("specimenLoans", {
-  id:                 int("id").autoincrement().primaryKey(),
-  specimenId:         int("specimenId").notNull(),
-  fromBranchId:       int("fromBranchId").notNull(),
-  toBranchId:         int("toBranchId").notNull(),
+export const specimenLoans = pgTable("specimenLoans", {
+  id:                 serial("id").primaryKey(),
+  specimenId:         integer("specimenId").notNull(),
+  fromBranchId:       integer("fromBranchId").notNull(),
+  toBranchId:         integer("toBranchId").notNull(),
   loanDate:           date("loanDate").notNull(),
   expectedReturnDate: date("expectedReturnDate"),
-  returnedAt:         datetime("returnedAt"),
+  returnedAt:         timestamp("returnedAt"),
   notes:              text("notes"),
   createdAt:          timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:          timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:          timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type SpecimenLoan = typeof specimenLoans.$inferSelect;
@@ -971,14 +1077,14 @@ export type InsertSpecimenLoan = typeof specimenLoans.$inferInsert;
 // KPI Templates
 // ---------------------------------------------------------------------------
 
-export const kpiTemplates = mysqlTable("kpiTemplates", {
-  id:          int("id").autoincrement().primaryKey(),
+export const kpiTemplates = pgTable("kpiTemplates", {
+  id:          serial("id").primaryKey(),
   name:        varchar("name", { length: 255 }).notNull(),
   description: text("description"),
-  branchId:    int("branchId"),
+  branchId:    integer("branchId"),
   active:      boolean("active").default(true).notNull(),
   createdAt:   timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:   timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:   timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type KPITemplate       = typeof kpiTemplates.$inferSelect;
@@ -988,16 +1094,16 @@ export type InsertKPITemplate = typeof kpiTemplates.$inferInsert;
 // KPI Questions
 // ---------------------------------------------------------------------------
 
-export const kpiQuestions = mysqlTable("kpiQuestions", {
-  id:            int("id").autoincrement().primaryKey(),
-  kpiTemplateId: int("kpiTemplateId").notNull(),
+export const kpiQuestions = pgTable("kpiQuestions", {
+  id:            serial("id").primaryKey(),
+  kpiTemplateId: integer("kpiTemplateId").notNull(),
   questionText:  text("questionText").notNull(),
-  questionType:  mysqlEnum("questionType", ["Text", "MultipleChoice", "Rating", "YesNo"]).default("Text").notNull(),
-  options:       json("options"),
+  questionType:  kpiQuestionsQuestionTypeEnum("questionType").default("Text").notNull(),
+  options:       jsonb("options"),
   isRequired:    boolean("isRequired").default(true).notNull(),
-  displayOrder:  int("displayOrder").default(0).notNull(),
+  displayOrder:  integer("displayOrder").default(0).notNull(),
   createdAt:     timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:     timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:     timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type KPIQuestion       = typeof kpiQuestions.$inferSelect;
@@ -1007,16 +1113,16 @@ export type InsertKPIQuestion = typeof kpiQuestions.$inferInsert;
 // KPI Records
 // ---------------------------------------------------------------------------
 
-export const kpiRecords = mysqlTable("kpiRecords", {
-  id:               int("id").autoincrement().primaryKey(),
-  kpiTemplateId:    int("kpiTemplateId").notNull(),
-  lecturerId:       int("lecturerId"),
-  courseScheduleId: int("courseScheduleId"),
+export const kpiRecords = pgTable("kpiRecords", {
+  id:               serial("id").primaryKey(),
+  kpiTemplateId:    integer("kpiTemplateId").notNull(),
+  lecturerId:       integer("lecturerId"),
+  courseScheduleId: integer("courseScheduleId"),
   evaluationDate:   date("evaluationDate").notNull(),
-  status:           mysqlEnum("status", ["Draft", "Submitted", "Approved", "Rejected"]).default("Draft").notNull(),
+  status:           kpiRecordsStatusEnum("status").default("Draft").notNull(),
   notes:            text("notes"),
   createdAt:        timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:        timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:        timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type KPIRecord       = typeof kpiRecords.$inferSelect;
@@ -1026,14 +1132,14 @@ export type InsertKPIRecord = typeof kpiRecords.$inferInsert;
 // KPI Answers
 // ---------------------------------------------------------------------------
 
-export const kpiAnswers = mysqlTable("kpiAnswers", {
-  id:             int("id").autoincrement().primaryKey(),
-  kpiRecordId:    int("kpiRecordId").notNull(),
-  kpiQuestionId:  int("kpiQuestionId").notNull(),
+export const kpiAnswers = pgTable("kpiAnswers", {
+  id:             serial("id").primaryKey(),
+  kpiRecordId:    integer("kpiRecordId").notNull(),
+  kpiQuestionId:  integer("kpiQuestionId").notNull(),
   answerText:     text("answerText"),
   answerValue:    varchar("answerValue", { length: 500 }),
   createdAt:      timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:      timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:      timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type KPIAnswer       = typeof kpiAnswers.$inferSelect;
@@ -1043,30 +1149,30 @@ export type InsertKPIAnswer = typeof kpiAnswers.$inferInsert;
 // Lecturers
 // ---------------------------------------------------------------------------
 
-export const lecturers = mysqlTable("lecturers", {
-  id:             int("id").autoincrement().primaryKey(),
+export const lecturers = pgTable("lecturers", {
+  id:             serial("id").primaryKey(),
   firstName:      varchar("firstName", { length: 255 }).notNull(),
   lastName:       varchar("lastName", { length: 255 }).notNull(),
   email:          varchar("email", { length: 320 }),
   phone:          varchar("phone", { length: 20 }),
   specialization: varchar("specialization", { length: 255 }),
-  branchId:       int("branchId"),
+  branchId:       integer("branchId"),
   active:         boolean("active").default(true).notNull(),
-  externalLinks:  json("externalLinks"),
+  externalLinks:  jsonb("externalLinks"),
   createdAt:      timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:      timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:      timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type Lecturer       = typeof lecturers.$inferSelect;
 export type InsertLecturer = typeof lecturers.$inferInsert;
 
-export const methods = mysqlTable("methods", {
-  id:          int("id").autoincrement().primaryKey(),
+export const methods = pgTable("methods", {
+  id:          serial("id").primaryKey(),
   name:        varchar("name", { length: 255 }).notNull().unique(),
   color:       varchar("color", { length: 20 }),
   description: text("description"),
   createdAt:   timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:   timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:   timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type Method = typeof methods.$inferSelect;
@@ -1076,17 +1182,17 @@ export type InsertMethod = typeof methods.$inferInsert;
 // Training Offerings
 // ---------------------------------------------------------------------------
 
-export const trainingOfferings = mysqlTable("trainingOfferings", {
-  id:          int("id").autoincrement().primaryKey(),
+export const trainingOfferings = pgTable("trainingOfferings", {
+  id:          serial("id").primaryKey(),
   name:        varchar("name", { length: 255 }).notNull(),
   description: text("description"),
-  courseId:    int("courseId"),
+  courseId:    integer("courseId"),
   startDate:   date("startDate"),
   endDate:     date("endDate"),
-  status:      mysqlEnum("status", ["Planned", "Active", "Completed", "Cancelled"]).default("Planned").notNull(),
-  branchId:    int("branchId"),
+  status:      trainingOfferingsStatusEnum("status").default("Planned").notNull(),
+  branchId:    integer("branchId"),
   createdAt:   timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:   timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:   timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type TrainingOffering       = typeof trainingOfferings.$inferSelect;
@@ -1096,107 +1202,100 @@ export type InsertTrainingOffering = typeof trainingOfferings.$inferInsert;
 // Documents
 // ---------------------------------------------------------------------------
 
-export const documents = mysqlTable("documents", {
-  id:           int("id").autoincrement().primaryKey(),
+export const documents = pgTable("documents", {
+  id:           serial("id").primaryKey(),
   title:        varchar("title", { length: 255 }).notNull(),
   description:  text("description"),
   documentType: varchar("documentType", { length: 100 }),
   content:      text("content"),
   url:          text("url").notNull(),
-  uploadedBy:   int("uploadedBy"),
-  branchId:     int("branchId"),
-  tags:         json("tags"),
+  uploadedBy:   integer("uploadedBy"),
+  branchId:     integer("branchId"),
+  tags:         jsonb("tags"),
   createdAt:    timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:    timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:    timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type Document       = typeof documents.$inferSelect;
 export type InsertDocument = typeof documents.$inferInsert;
 
-export const plannerEntries = mysqlTable("plannerEntries", {
-  id:         int("id").autoincrement().primaryKey(),
-  userId:     int("userId").notNull(),
+export const plannerEntries = pgTable("plannerEntries", {
+  id:         serial("id").primaryKey(),
+  userId:     integer("userId").notNull(),
   title:      varchar("title", { length: 255 }).notNull(),
   entryDate:  date("entryDate").notNull(),
   notes:      text("notes"),
-  reminderAt: datetime("reminderAt"),
+  reminderAt: timestamp("reminderAt"),
   isComplete: boolean("isComplete").default(false).notNull(),
   recurrence: varchar("recurrence", { length: 30 }),
   recurrenceUntil: date("recurrenceUntil"),
   createdAt:  timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:  timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:  timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type PlannerEntry = typeof plannerEntries.$inferSelect;
 export type InsertPlannerEntry = typeof plannerEntries.$inferInsert;
 
-export const sharedPlannerEvents = mysqlTable("sharedPlannerEvents", {
-  id:               int("id").autoincrement().primaryKey(),
+export const sharedPlannerEvents = pgTable("sharedPlannerEvents", {
+  id:               serial("id").primaryKey(),
   title:            varchar("title", { length: 255 }).notNull(),
-  eventType:        mysqlEnum("eventType", [
-    "Meeting",
-    "Training",
-    "Deadline",
-    "Reminder",
-    "Visit",
-    "General",
-  ]).default("General").notNull(),
-  branchId:         int("branchId"),
-  createdByUserId:  int("createdByUserId").notNull(),
-  startAt:          datetime("startAt").notNull(),
-  endAt:            datetime("endAt"),
+  eventType:        sharedPlannerEventsEventTypeEnum("eventType").default("General").notNull(),
+  branchId:         integer("branchId"),
+  createdByUserId:  integer("createdByUserId").notNull(),
+  startAt:          timestamp("startAt").notNull(),
+  endAt:            timestamp("endAt"),
   isAllDay:         boolean("isAllDay").default(false).notNull(),
   location:         varchar("location", { length: 255 }),
   notes:            text("notes"),
   recurrence:       varchar("recurrence", { length: 30 }),
   recurrenceUntil:  date("recurrenceUntil"),
   createdAt:        timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:        timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:        timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type SharedPlannerEvent = typeof sharedPlannerEvents.$inferSelect;
 export type InsertSharedPlannerEvent = typeof sharedPlannerEvents.$inferInsert;
 
-export const plannerTimesheetProfiles = mysqlTable("plannerTimesheetProfiles", {
-  id:            int("id").autoincrement().primaryKey(),
-  userId:        int("userId").notNull().unique(),
+export const plannerTimesheetProfiles = pgTable("plannerTimesheetProfiles", {
+  id:            serial("id").primaryKey(),
+  userId:        integer("userId").notNull().unique(),
   department:    varchar("department", { length: 255 }),
   signatureName: varchar("signatureName", { length: 255 }),
-  personalLeaveAllowanceDays: int("personalLeaveAllowanceDays"),
-  personalLeaveCarryOverDays: int("personalLeaveCarryOverDays").default(0).notNull(),
-  leaveYearStartMonth: int("leaveYearStartMonth").default(1).notNull(),
+  personalLeaveAllowanceDays: integer("personalLeaveAllowanceDays"),
+  personalLeaveCarryOverDays: integer("personalLeaveCarryOverDays").default(0).notNull(),
+  leaveYearStartMonth: integer("leaveYearStartMonth").default(1).notNull(),
   monThuStartTime: varchar("monThuStartTime", { length: 10 }),
   monThuEndTime: varchar("monThuEndTime", { length: 10 }),
   fridayStartTime: varchar("fridayStartTime", { length: 10 }),
   fridayEndTime: varchar("fridayEndTime", { length: 10 }),
   weekendStartTime: varchar("weekendStartTime", { length: 10 }),
   weekendEndTime: varchar("weekendEndTime", { length: 10 }),
-  monThuTemplateId: int("monThuTemplateId"),
-  fridayTemplateId: int("fridayTemplateId"),
-  weekendTemplateId: int("weekendTemplateId"),
-  lunchBreakMinutes: int("lunchBreakMinutes").default(60).notNull(),
-  teaBreakMinutes: int("teaBreakMinutes").default(30).notNull(),
+  monThuTemplateId: integer("monThuTemplateId"),
+  fridayTemplateId: integer("fridayTemplateId"),
+  weekendTemplateId: integer("weekendTemplateId"),
+  lunchBreakMinutes: integer("lunchBreakMinutes").default(60).notNull(),
+  teaBreakMinutes: integer("teaBreakMinutes").default(30).notNull(),
   createdAt:     timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:     timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:     timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type PlannerTimesheetProfile = typeof plannerTimesheetProfiles.$inferSelect;
 export type InsertPlannerTimesheetProfile = typeof plannerTimesheetProfiles.$inferInsert;
 
-export const plannerTimesheetDepartmentCoverageSettings = mysqlTable(
+export const plannerTimesheetDepartmentCoverageSettings = pgTable(
   "plannerTimesheetDepartmentCoverageSettings",
   {
-    id: int("id").autoincrement().primaryKey(),
+    id: serial("id").primaryKey(),
     department: varchar("department", { length: 255 }).notNull().unique(),
-    minimumAvailableCount: int("minimumAvailableCount"),
-    maximumPeopleOff: int("maximumPeopleOff"),
-    mediumRiskPercent: int("mediumRiskPercent").default(25).notNull(),
-    highRiskPercent: int("highRiskPercent").default(50).notNull(),
+    minimumAvailableCount: integer("minimumAvailableCount"),
+    maximumPeopleOff: integer("maximumPeopleOff"),
+    mediumRiskPercent: integer("mediumRiskPercent").default(25).notNull(),
+    highRiskPercent: integer("highRiskPercent").default(50).notNull(),
     notes: text("notes"),
-    createdByUserId: int("createdByUserId"),
-    updatedByUserId: int("updatedByUserId"),
+    createdByUserId: integer("createdByUserId"),
+    updatedByUserId: integer("updatedByUserId"),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
-    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
   }
 );
 
@@ -1205,76 +1304,76 @@ export type PlannerTimesheetDepartmentCoverageSetting =
 export type InsertPlannerTimesheetDepartmentCoverageSetting =
   typeof plannerTimesheetDepartmentCoverageSettings.$inferInsert;
 
-export const plannerTimesheetOptions = mysqlTable("plannerTimesheetOptions", {
-  id:          int("id").autoincrement().primaryKey(),
-  userId:      int("userId").notNull(),
+export const plannerTimesheetOptions = pgTable("plannerTimesheetOptions", {
+  id:          serial("id").primaryKey(),
+  userId:      integer("userId").notNull(),
   label:       varchar("label", { length: 255 }).notNull(),
   description: text("description"),
-  sortOrder:   int("sortOrder").default(0).notNull(),
+  sortOrder:   integer("sortOrder").default(0).notNull(),
   hoursCategory: varchar("hoursCategory", { length: 30 }).default("working").notNull(),
   isActive:    boolean("isActive").default(true).notNull(),
   createdAt:   timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:   timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:   timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type PlannerTimesheetOption = typeof plannerTimesheetOptions.$inferSelect;
 export type InsertPlannerTimesheetOption = typeof plannerTimesheetOptions.$inferInsert;
 
-export const plannerTimesheetEntries = mysqlTable("plannerTimesheetEntries", {
-    id:                int("id").autoincrement().primaryKey(),
-    userId:            int("userId").notNull(),
+export const plannerTimesheetEntries = pgTable("plannerTimesheetEntries", {
+    id:                serial("id").primaryKey(),
+    userId:            integer("userId").notNull(),
     entryDate:         date("entryDate").notNull(),
     startTime:         varchar("startTime", { length: 10 }),
     endTime:           varchar("endTime", { length: 10 }),
-    lunchBreakMinutes: int("lunchBreakMinutes"),
-    teaBreakMinutes:   int("teaBreakMinutes"),
-    leavePortionPercent: int("leavePortionPercent"),
-    selectedOptionIds: json("selectedOptionIds").$type<number[]>().notNull(),
+    lunchBreakMinutes: integer("lunchBreakMinutes"),
+    teaBreakMinutes:   integer("teaBreakMinutes"),
+    leavePortionPercent: integer("leavePortionPercent"),
+    selectedOptionIds: jsonb("selectedOptionIds").$type<number[]>().notNull(),
     remarks:           text("remarks"),
     createdAt:         timestamp("createdAt").defaultNow().notNull(),
-    updatedAt:         timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+    updatedAt:         timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
   });
 
 export type PlannerTimesheetEntry = typeof plannerTimesheetEntries.$inferSelect;
 export type InsertPlannerTimesheetEntry = typeof plannerTimesheetEntries.$inferInsert;
 
-export const plannerTimesheetTemplates = mysqlTable("plannerTimesheetTemplates", {
-  id:                int("id").autoincrement().primaryKey(),
-  userId:            int("userId").notNull(),
+export const plannerTimesheetTemplates = pgTable("plannerTimesheetTemplates", {
+  id:                serial("id").primaryKey(),
+  userId:            integer("userId").notNull(),
   label:             varchar("label", { length: 255 }).notNull(),
   description:       text("description"),
   startTime:         varchar("startTime", { length: 10 }),
   endTime:           varchar("endTime", { length: 10 }),
-  lunchBreakMinutes: int("lunchBreakMinutes"),
-  teaBreakMinutes:   int("teaBreakMinutes"),
-  leavePortionPercent: int("leavePortionPercent"),
-  selectedOptionIds: json("selectedOptionIds").$type<number[]>().notNull(),
+  lunchBreakMinutes: integer("lunchBreakMinutes"),
+  teaBreakMinutes:   integer("teaBreakMinutes"),
+  leavePortionPercent: integer("leavePortionPercent"),
+  selectedOptionIds: jsonb("selectedOptionIds").$type<number[]>().notNull(),
   remarks:           text("remarks"),
   isActive:          boolean("isActive").default(true).notNull(),
   createdAt:         timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:         timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:         timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type PlannerTimesheetTemplate = typeof plannerTimesheetTemplates.$inferSelect;
 export type InsertPlannerTimesheetTemplate = typeof plannerTimesheetTemplates.$inferInsert;
 
-export const plannerTimesheetHolidays = mysqlTable("plannerTimesheetHolidays", {
-  id:         int("id").autoincrement().primaryKey(),
-  userId:     int("userId").notNull(),
+export const plannerTimesheetHolidays = pgTable("plannerTimesheetHolidays", {
+  id:         serial("id").primaryKey(),
+  userId:     integer("userId").notNull(),
   holidayDate: date("holidayDate").notNull(),
   label:      varchar("label", { length: 255 }).notNull(),
   holidayType: varchar("holidayType", { length: 40 }).notNull().default("public_holiday"),
   notes:      text("notes"),
   createdAt:  timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:  timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:  timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type PlannerTimesheetHoliday = typeof plannerTimesheetHolidays.$inferSelect;
 export type InsertPlannerTimesheetHoliday = typeof plannerTimesheetHolidays.$inferInsert;
 
-export const plannerTimesheetMonthStatuses = mysqlTable("plannerTimesheetMonthStatuses", {
-  id:           int("id").autoincrement().primaryKey(),
-  userId:       int("userId").notNull(),
+export const plannerTimesheetMonthStatuses = pgTable("plannerTimesheetMonthStatuses", {
+  id:           serial("id").primaryKey(),
+  userId:       integer("userId").notNull(),
   monthDate:    date("monthDate").notNull(),
   status:       varchar("status", { length: 20 }).notNull().default("open"),
   statusNote:   text("statusNote"),
@@ -1285,16 +1384,16 @@ export const plannerTimesheetMonthStatuses = mysqlTable("plannerTimesheetMonthSt
   employeeDeclarationAcceptedAt: timestamp("employeeDeclarationAcceptedAt"),
   submissionNote:  text("submissionNote"),
   reviewedAt:   timestamp("reviewedAt"),
-  reviewedByUserId: int("reviewedByUserId"),
+  reviewedByUserId: integer("reviewedByUserId"),
   reviewedByName:   varchar("reviewedByName", { length: 255 }),
   reviewerDeclarationAccepted: boolean("reviewerDeclarationAccepted").notNull().default(false),
   reviewerDeclarationAcceptedAt: timestamp("reviewerDeclarationAcceptedAt"),
   reviewNote:       text("reviewNote"),
   handedOffAt:      timestamp("handedOffAt"),
-  handedOffByUserId: int("handedOffByUserId"),
+  handedOffByUserId: integer("handedOffByUserId"),
   handedOffByName:   varchar("handedOffByName", { length: 255 }),
   handoffNote:       text("handoffNote"),
-  historyJson:      json("historyJson").$type<
+  historyJson:      jsonb("historyJson").$type<
     {
       id: string;
       action: string;
@@ -1308,24 +1407,24 @@ export const plannerTimesheetMonthStatuses = mysqlTable("plannerTimesheetMonthSt
   >(),
   reopenedAt:   timestamp("reopenedAt"),
   createdAt:    timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:    timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:    timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type PlannerTimesheetMonthStatus = typeof plannerTimesheetMonthStatuses.$inferSelect;
 export type InsertPlannerTimesheetMonthStatus = typeof plannerTimesheetMonthStatuses.$inferInsert;
 
-export const plannerTimesheetLeaveOverrideReviews = mysqlTable(
+export const plannerTimesheetLeaveOverrideReviews = pgTable(
   "plannerTimesheetLeaveOverrideReviews",
   {
-    id: int("id").autoincrement().primaryKey(),
-    userId: int("userId").notNull(),
+    id: serial("id").primaryKey(),
+    userId: integer("userId").notNull(),
     entryDate: date("entryDate").notNull(),
     reviewedAt: timestamp("reviewedAt"),
-    reviewedByUserId: int("reviewedByUserId"),
+    reviewedByUserId: integer("reviewedByUserId"),
     reviewedByName: varchar("reviewedByName", { length: 255 }),
     reviewNote: text("reviewNote"),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
-    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
   }
 );
 
@@ -1338,17 +1437,17 @@ export type InsertPlannerTimesheetLeaveOverrideReview =
 // Import Logs
 // ---------------------------------------------------------------------------
 
-export const importLogs = mysqlTable("importLogs", {
-  id:                int("id").autoincrement().primaryKey(),
+export const importLogs = pgTable("importLogs", {
+  id:                serial("id").primaryKey(),
   entityType:        varchar("entityType", { length: 100 }).notNull(),
   fileName:          varchar("fileName", { length: 255 }).notNull(),
-  totalRecords:      int("totalRecords").notNull(),
-  successfulRecords: int("successfulRecords").notNull(),
-  failedRecords:     int("failedRecords").notNull(),
-  columnMapping:     json("columnMapping").notNull(),
-  status:            mysqlEnum("status", ["Pending", "Processing", "Completed", "Failed"]).default("Pending").notNull(),
+  totalRecords:      integer("totalRecords").notNull(),
+  successfulRecords: integer("successfulRecords").notNull(),
+  failedRecords:     integer("failedRecords").notNull(),
+  columnMapping:     jsonb("columnMapping").notNull(),
+  status:            importLogsStatusEnum("status").default("Pending").notNull(),
   errorLog:          text("errorLog"),
-  uploadedBy:        int("uploadedBy"),
+  uploadedBy:        integer("uploadedBy"),
   createdAt:         timestamp("createdAt").defaultNow().notNull(),
 });
 
@@ -1359,16 +1458,16 @@ export type InsertImportLog = typeof importLogs.$inferInsert;
 // Audit Logs
 // ---------------------------------------------------------------------------
 
-export const auditLogs = mysqlTable("auditLogs", {
-  id:           int("id").autoincrement().primaryKey(),
-  userId:       int("userId").notNull(),
+export const auditLogs = pgTable("auditLogs", {
+  id:           serial("id").primaryKey(),
+  userId:       integer("userId").notNull(),
   action:       varchar("action", { length: 100 }).notNull(),
   entityType:   varchar("entityType", { length: 100 }).notNull(),
-  entityId:     int("entityId").notNull(),
-  changes:      json("changes"),
+  entityId:     integer("entityId").notNull(),
+  changes:      jsonb("changes"),
   ipAddress:    varchar("ipAddress", { length: 45 }),
   userAgent:    text("userAgent"),
-  status:       mysqlEnum("status", ["Success", "Failed"]).default("Success").notNull(),
+  status:       auditLogsStatusEnum("status").default("Success").notNull(),
   errorMessage: text("errorMessage"),
   createdAt:    timestamp("createdAt").defaultNow().notNull(),
 });
@@ -1380,16 +1479,16 @@ export type InsertAuditLog = typeof auditLogs.$inferInsert;
 // Reports
 // ---------------------------------------------------------------------------
 
-export const reports = mysqlTable("reports", {
-  id:          int("id").autoincrement().primaryKey(),
+export const reports = pgTable("reports", {
+  id:          serial("id").primaryKey(),
   title:       varchar("title", { length: 255 }).notNull(),
   reportType:  varchar("reportType", { length: 100 }).notNull(),
-  generatedBy: int("generatedBy"),
-  branchId:    int("branchId"),
-  filters:     json("filters"),
-  data:        json("data"),
+  generatedBy: integer("generatedBy"),
+  branchId:    integer("branchId"),
+  filters:     jsonb("filters"),
+  data:        jsonb("data"),
   createdAt:   timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:   timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:   timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type Report       = typeof reports.$inferSelect;
@@ -1399,36 +1498,20 @@ export type InsertReport = typeof reports.$inferInsert;
 // Quality Actions
 // ---------------------------------------------------------------------------
 
-export const qualityActions = mysqlTable("qualityActions", {
-  id:                 int("id").autoincrement().primaryKey(),
+export const qualityActions = pgTable("qualityActions", {
+  id:                 serial("id").primaryKey(),
   referenceNumber:    varchar("referenceNumber", { length: 60 }).notNull().unique(),
   title:              varchar("title", { length: 255 }).notNull(),
-  category:           mysqlEnum("category", [
-    "Nonconformance",
-    "Corrective Action",
-    "Observation",
-    "Improvement",
-  ]).default("Nonconformance").notNull(),
-  source:             mysqlEnum("source", [
-    "Customer Complaint",
-    "Internal Audit",
-    "Supplier",
-    "Training",
-    "Examination",
-    "Level III",
-    "Equipment",
-    "Document Control",
-    "Management Review",
-    "Other",
-  ]).default("Other").notNull(),
-  severity:           mysqlEnum("severity", ["Minor", "Major", "Critical"]).default("Minor").notNull(),
-  status:             mysqlEnum("status", ["Open", "In Progress", "Awaiting Verification", "Closed"]).default("Open").notNull(),
-  branchId:           int("branchId"),
+  category:           qualityActionsCategoryEnum("category").default("Nonconformance").notNull(),
+  source:             qualityActionsSourceEnum("source").default("Other").notNull(),
+  severity:           qualityActionsSeverityEnum("severity").default("Minor").notNull(),
+  status:             qualityActionsStatusEnum("status").default("Open").notNull(),
+  branchId:           integer("branchId"),
   ownerName:          varchar("ownerName", { length: 255 }),
-  reportedByUserId:   int("reportedByUserId"),
+  reportedByUserId:   integer("reportedByUserId"),
   reportedDate:       date("reportedDate").notNull(),
   dueDate:            date("dueDate"),
-  closedAt:           datetime("closedAt"),
+  closedAt:           timestamp("closedAt"),
   description:        text("description").notNull(),
   immediateCorrection:text("immediateCorrection"),
   rootCause:          text("rootCause"),
@@ -1436,26 +1519,19 @@ export const qualityActions = mysqlTable("qualityActions", {
   verificationNotes:  text("verificationNotes"),
   verifiedByName:     varchar("verifiedByName", { length: 255 }),
   createdAt:          timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:          timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:          timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type QualityAction = typeof qualityActions.$inferSelect;
 export type InsertQualityAction = typeof qualityActions.$inferInsert;
 
-export const qualityAudits = mysqlTable("qualityAudits", {
-  id:               int("id").autoincrement().primaryKey(),
+export const qualityAudits = pgTable("qualityAudits", {
+  id:               serial("id").primaryKey(),
   referenceNumber:  varchar("referenceNumber", { length: 60 }).notNull().unique(),
   title:            varchar("title", { length: 255 }).notNull(),
-  auditType:        mysqlEnum("auditType", [
-    "Internal Audit",
-    "Process Audit",
-    "Training Audit",
-    "Equipment Audit",
-    "Document Audit",
-    "Branch Audit",
-  ]).default("Internal Audit").notNull(),
-  status:           mysqlEnum("status", ["Planned", "In Progress", "Completed", "Cancelled"]).default("Planned").notNull(),
-  branchId:         int("branchId"),
+  auditType:        qualityAuditsAuditTypeEnum("auditType").default("Internal Audit").notNull(),
+  status:           qualityAuditsStatusEnum("status").default("Planned").notNull(),
+  branchId:         integer("branchId"),
   leadAuditor:      varchar("leadAuditor", { length: 255 }),
   auditee:          varchar("auditee", { length: 255 }),
   plannedDate:      date("plannedDate").notNull(),
@@ -1467,18 +1543,18 @@ export const qualityAudits = mysqlTable("qualityAudits", {
   findingsSummary:  text("findingsSummary"),
   followUpSummary:  text("followUpSummary"),
   createdAt:        timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:        timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:        timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type QualityAudit = typeof qualityAudits.$inferSelect;
 export type InsertQualityAudit = typeof qualityAudits.$inferInsert;
 
-export const managementReviews = mysqlTable("managementReviews", {
-  id:                int("id").autoincrement().primaryKey(),
+export const managementReviews = pgTable("managementReviews", {
+  id:                serial("id").primaryKey(),
   referenceNumber:   varchar("referenceNumber", { length: 60 }).notNull().unique(),
   title:             varchar("title", { length: 255 }).notNull(),
-  status:            mysqlEnum("status", ["Planned", "Held", "Closed", "Cancelled"]).default("Planned").notNull(),
-  branchId:          int("branchId"),
+  status:            managementReviewsStatusEnum("status").default("Planned").notNull(),
+  branchId:          integer("branchId"),
   meetingDate:       date("meetingDate").notNull(),
   nextReviewDate:    date("nextReviewDate"),
   chairperson:       varchar("chairperson", { length: 255 }),
@@ -1488,36 +1564,20 @@ export const managementReviews = mysqlTable("managementReviews", {
   decisionsSummary:  text("decisionsSummary"),
   actionSummary:     text("actionSummary"),
   createdAt:         timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:         timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:         timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type ManagementReview = typeof managementReviews.$inferSelect;
 export type InsertManagementReview = typeof managementReviews.$inferInsert;
 
-export const externalProviders = mysqlTable("externalProviders", {
-  id:                  int("id").autoincrement().primaryKey(),
+export const externalProviders = pgTable("externalProviders", {
+  id:                  serial("id").primaryKey(),
   referenceNumber:     varchar("referenceNumber", { length: 60 }).notNull().unique(),
   companyName:         varchar("companyName", { length: 255 }).notNull(),
-  providerType:        mysqlEnum("providerType", [
-    "Lecturer",
-    "Assessor",
-    "Calibration",
-    "Consumables",
-    "Venue",
-    "Equipment",
-    "Level III Consultant",
-    "Document / Printing",
-    "Other",
-  ]).default("Other").notNull(),
-  status:              mysqlEnum("status", [
-    "Approved",
-    "Conditional",
-    "Under Review",
-    "Suspended",
-    "Inactive",
-  ]).default("Approved").notNull(),
-  rating:              mysqlEnum("rating", ["Preferred", "Acceptable", "Probationary"]).default("Acceptable").notNull(),
-  branchId:            int("branchId"),
+  providerType:        externalProvidersProviderTypeEnum("providerType").default("Other").notNull(),
+  status:              externalProvidersStatusEnum("status").default("Approved").notNull(),
+  rating:              externalProvidersRatingEnum("rating").default("Acceptable").notNull(),
+  branchId:            integer("branchId"),
   primaryContact:      varchar("primaryContact", { length: 255 }),
   email:               varchar("email", { length: 320 }),
   phone:               varchar("phone", { length: 50 }),
@@ -1528,7 +1588,7 @@ export const externalProviders = mysqlTable("externalProviders", {
   notes:               text("notes"),
   correctiveActionNotes: text("correctiveActionNotes"),
   createdAt:           timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:           timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:           timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type ExternalProvider = typeof externalProviders.$inferSelect;
@@ -1538,23 +1598,19 @@ export type InsertExternalProvider = typeof externalProviders.$inferInsert;
 // Notifications
 // ---------------------------------------------------------------------------
 
-export const notifications = mysqlTable("notifications", {
-  id:            int("id").autoincrement().primaryKey(),
-  userId:        int("userId").notNull(),
-  type:          mysqlEnum("type", [
-    "student_added", "lead_status_changed", "attendance_marked",
-    "equipment_maintenance", "specimen_mastered", "kpi_completed",
-    "course_started", "enrollment_confirmed", "system_alert",
-  ]).notNull(),
+export const notifications = pgTable("notifications", {
+  id:            serial("id").primaryKey(),
+  userId:        integer("userId").notNull(),
+  type:          notificationsTypeEnum("type").notNull(),
   title:         varchar("title", { length: 255 }).notNull(),
   message:       text("message").notNull(),
   entityType:    varchar("entityType", { length: 100 }),
-  entityId:      int("entityId"),
-  relatedUserId: int("relatedUserId"),
+  entityId:      integer("entityId"),
+  relatedUserId: integer("relatedUserId"),
   isRead:        boolean("isRead").default(false).notNull(),
   actionUrl:     text("actionUrl"),
-  metadata:      json("metadata"),
-  priority:      mysqlEnum("priority", ["low", "normal", "high", "critical"]).default("normal").notNull(),
+  metadata:      jsonb("metadata"),
+  priority:      notificationsPriorityEnum("priority").default("normal").notNull(),
   createdAt:     timestamp("createdAt").defaultNow().notNull(),
   readAt:        timestamp("readAt"),
 });
@@ -1566,9 +1622,9 @@ export type InsertNotification = typeof notifications.$inferInsert;
 // Notification Preferences
 // ---------------------------------------------------------------------------
 
-export const notificationPreferences = mysqlTable("notificationPreferences", {
-  id:                   int("id").autoincrement().primaryKey(),
-  userId:               int("userId").notNull().unique(),
+export const notificationPreferences = pgTable("notificationPreferences", {
+  id:                   serial("id").primaryKey(),
+  userId:               integer("userId").notNull().unique(),
   emailNotifications:   boolean("emailNotifications").default(true).notNull(),
   pushNotifications:    boolean("pushNotifications").default(true).notNull(),
   soundAlerts:          boolean("soundAlerts").default(true).notNull(),
@@ -1582,7 +1638,7 @@ export const notificationPreferences = mysqlTable("notificationPreferences", {
   enrollmentNotif:      boolean("enrollmentNotif").default(true).notNull(),
   systemAlertNotif:     boolean("systemAlertNotif").default(true).notNull(),
   createdAt:            timestamp("createdAt").defaultNow().notNull(),
-  updatedAt:            timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt:            timestamp("updatedAt").defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 export type NotificationPreference       = typeof notificationPreferences.$inferSelect;
@@ -1592,9 +1648,9 @@ export type InsertNotificationPreference = typeof notificationPreferences.$infer
 // Notification Subscriptions
 // ---------------------------------------------------------------------------
 
-export const notificationSubscriptions = mysqlTable("notificationSubscriptions", {
-  id:         int("id").autoincrement().primaryKey(),
-  userId:     int("userId").notNull(),
+export const notificationSubscriptions = pgTable("notificationSubscriptions", {
+  id:         serial("id").primaryKey(),
+  userId:     integer("userId").notNull(),
   deviceId:   varchar("deviceId", { length: 255 }).notNull(),
   endpoint:   text("endpoint"),
   auth:       text("auth"),
