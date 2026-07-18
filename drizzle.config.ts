@@ -6,9 +6,10 @@ if (!connectionString) {
 }
 
 export default defineConfig({
-  // ... other settings
-  dialect: "postgresql", // Change from "mysql" to "postgresql"
+  schema: "./drizzle/schema.ts",
+  out: "./drizzle",
+  dialect: "postgresql", // MUST be 'postgresql' for Supabase
   dbCredentials: {
-    url: connectionString,
+    url: process.env.DATABASE_URL!,
   },
 });
