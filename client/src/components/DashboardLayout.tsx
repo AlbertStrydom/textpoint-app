@@ -134,8 +134,8 @@ const menuSections: { label: string; items: MenuItem[] }[] = [
     label: "Administration",
     items: [
       { icon: Settings, label: "Admin", path: "/admin", module: "admin" },
-      { icon: Shield, label: "Admin Panel", path: "/admin-enhanced", module: "admin" },
-      { icon: Cog, label: "Super Admin", path: "/super-admin-settings", module: "admin" },
+      { icon: Shield, label: "Admin Panel", path: "/admin", module: "admin" },
+      { icon: Cog, label: "Super Admin", path: "/admin", module: "admin" },
       ...(isDevelopment
         ? [{ icon: Code2, label: "Samples", path: "/components", module: "admin" }]
         : []),
