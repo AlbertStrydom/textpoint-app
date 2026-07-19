@@ -341,7 +341,8 @@ export async function upsertAppUser(data: {
       lastSignedIn: data.lastSignedIn,
       role: "user",
     })
-    .onDuplicateKeyUpdate({
+    .onConflictDoUpdate({
+      target: users.email,
       set: { name: data.name, lastSignedIn: data.lastSignedIn },
     });
 }

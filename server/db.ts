@@ -1,4 +1,4 @@
-﻿import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import {
   randomBytes,
   randomUUID,
@@ -115,14 +115,14 @@ import {
 
 // (db and getDb are now in ./_core/db.ts)
 
-export const USER_ROLE_ENUM_SQL = "ENUM('user','admin','super_admin')";
+export const USER_ROLE_ENUM_SQL = "'user','admin','super_admin'";
 
 export function userRoleColumnSupportsSuperAdmin(columnType: unknown) {
-  return typeof columnType === "string" && columnType.toLowerCase().includes("'super_admin'");
+  return typeof columnType === "string" && columnType.toLowerCase().includes("super_admin");
 }
 
 export function buildUserRoleEnumRepairSql() {
-  return `ALTER TABLE \`users\` MODIFY COLUMN \`role\` ${USER_ROLE_ENUM_SQL} NOT NULL DEFAULT 'user'`;
+  return `ALTER TABLE "users" ALTER COLUMN "role" SET DATA TYPE text CHECK ("role" IN (${USER_ROLE_ENUM_SQL}))`;
 }
 
 function getFirstSqlRow(value: unknown) {
@@ -145,7 +145,7 @@ function getDbSqlRows<T extends Record<string, unknown> = Record<string, unknown
 }
 
 // Previously: ensureRuntimeColumn / ensureRuntimeTable performed unsafe DDL via sql.raw()
-// These were removed â€” all columns and tables are defined in drizzle/schema.ts and must
+// These were removed — all columns and tables are defined in drizzle/schema.ts and must
 // be managed through proper Migrations. If a column is missing, run the latest migration.
 async function ensureRuntimeColumn(
   _tableName: string,
@@ -354,8 +354,8 @@ async function ensurePortalTechnicianRequirementUniqueness() {
     SELECT
       technicianId,
       definitionId,
-      GROUP_CONCAT(id ORDER BY updatedAt DESC, createdAt DESC, id DESC) AS duplicateIds,
-      COUNT(*) AS duplicateCount
+      STRING_AGG(id::text, ',' ORDER BY updatedAt DESC, createdAt DESC, id DESC) AS "duplicateIds",
+      COUNT(*) AS "duplicateCount"
     FROM portalTechnicianRequirements
     GROUP BY technicianId, definitionId
     HAVING COUNT(*) > 1
@@ -373,19 +373,25 @@ async function ensurePortalTechnicianRequirementUniqueness() {
   }
 
   const uniqueKeyResult = await db.execute(sql`
-    SELECT COUNT(*) AS indexCount
-    FROM information_schema.statistics
-    WHERE table_schema = DATABASE()
-      AND table_name = 'portalTechnicianRequirements'
-      AND index_name = 'portalTechnicianRequirements_unique'
+    SELECT COUNT(*) AS "indexCount"
+    FROM pg_indexes
+    WHERE tablename = 'portalTechnicianRequirements'
+      AND indexname = 'portalTechnicianRequirements_unique'
   `);
   const uniqueKeyCount = Number(getFirstSqlRow(uniqueKeyResult)?.indexCount ?? 0);
   if (uniqueKeyCount === 0) {
-    await db.execute(
-      sql.raw(
-        "ALTER TABLE `portalTechnicianRequirements` ADD UNIQUE KEY `portalTechnicianRequirements_unique` (`technicianId`, `definitionId`)"
-      )
-    );
+    try {
+      await db.execute(
+        sql.raw(
+          'CREATE UNIQUE INDEX IF NOT EXISTS "portalTechnicianRequirements_unique" ON "portalTechnicianRequirements" ("technicianId", "definitionId")'
+        )
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+      if (!message.includes("already exists")) {
+        throw error;
+      }
+    }
   }
 
   _portalTechnicianUniquenessDone.add(dedupeKey);
@@ -461,7 +467,7 @@ async function ensurePortalRequirementDefinitionUniqueness() {
     if (duplicateDefinitionIds.length === 0) continue;
 
     const groupedRequirementsResult = await db.execute(sql`
-      SELECT technicianId, GROUP_CONCAT(id ORDER BY updatedAt DESC, createdAt DESC, id DESC) AS recordIds
+      SELECT technicianId, STRING_AGG(id::text, ',' ORDER BY updatedAt DESC, createdAt DESC, id DESC) AS "recordIds"
       FROM portalTechnicianRequirements
       WHERE definitionId IN (${sql.join(
         rankedDefinitions.map((definition) => sql`${definition.id}`),
@@ -547,23 +553,22 @@ async function ensurePortalRequirementDefinitionUniqueness() {
   }
 
   const uniqueKeyResult = await db.execute(sql`
-    SELECT COUNT(*) AS indexCount
-    FROM information_schema.statistics
-    WHERE table_schema = DATABASE()
-      AND table_name = 'portalRequirementDefinitions'
-      AND index_name = 'portalRequirementDefinitions_client_name_unique'
+    SELECT COUNT(*) AS "indexCount"
+    FROM pg_indexes
+    WHERE tablename = 'portalRequirementDefinitions'
+      AND indexname = 'portalRequirementDefinitions_client_name_unique'
   `);
   const uniqueKeyCount = Number(getFirstSqlRow(uniqueKeyResult)?.indexCount ?? 0);
   if (uniqueKeyCount === 0) {
     try {
       await db.execute(
         sql.raw(
-          "ALTER TABLE `portalRequirementDefinitions` ADD UNIQUE KEY `portalRequirementDefinitions_client_name_unique` (`clientId`, `name`)"
+          'CREATE UNIQUE INDEX IF NOT EXISTS "portalRequirementDefinitions_client_name_unique" ON "portalRequirementDefinitions" ("clientId", "name")'
         )
       );
     } catch (error) {
       const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
-      if (!message.includes("duplicate key name") && !message.includes("er_dup_keyname")) {
+      if (!message.includes("already exists")) {
         throw error;
       }
     }
@@ -573,7 +578,7 @@ async function ensurePortalRequirementDefinitionUniqueness() {
 }
 
 // ---------------------------------------------------------------------------
-// Runtime column helpers (no-ops â€” columns managed via migrations)
+// Runtime column helpers (no-ops — columns managed via migrations)
 // ---------------------------------------------------------------------------
 
 async function ensureUserRuntimeColumns() {
@@ -584,7 +589,7 @@ async function ensureMethodRuntimeColumns() {
   // No-op
 }
 
-// Auth module functions â€” imported here so they're available locally in db.ts,
+// Auth module functions — imported here so they're available locally in db.ts,
 // then re-exported for consumers. This avoids the "cannot find name" errors
 // that happen with `export { x } from "./auth/db"` syntax.
 import {
@@ -749,7 +754,7 @@ export async function saveUserModuleAccess(
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-// Students â€” delegated to server/students/db.ts
+// Students — delegated to server/students/db.ts
 // ---------------------------------------------------------------------------
 
 export const {
@@ -762,7 +767,7 @@ export const {
 } = studentsDb;
 
 // ---------------------------------------------------------------------------
-// Leads â€” delegated to server/leads/db.ts
+// Leads — delegated to server/leads/db.ts
 // ---------------------------------------------------------------------------
 
 export const {
@@ -1300,385 +1305,10 @@ function normalisePortalApprovalPayload(
 }
 
 async function ensureClientPortalRuntimeTables() {
-  await ensureRuntimeTable(
-    "portalClientUsers",
-    `CREATE TABLE IF NOT EXISTS \`portalClientUsers\` (
-      \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`clientId\` INT NOT NULL,
-      \`userId\` INT NOT NULL,
-      \`accessLevel\` ENUM('viewer','editor','manager') NOT NULL DEFAULT 'viewer',
-      \`receiveReminders\` TINYINT(1) NOT NULL DEFAULT 1,
-      \`createdAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      \`updatedAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      UNIQUE KEY \`portalClientUsers_client_user_unique\` (\`clientId\`, \`userId\`),
-      KEY \`portalClientUsers_user_idx\` (\`userId\`),
-      KEY \`portalClientUsers_client_idx\` (\`clientId\`)
-    )`
-  );
-
-  await ensureRuntimeTable(
-    "portalRequirementDefinitions",
-    `CREATE TABLE IF NOT EXISTS \`portalRequirementDefinitions\` (
-      \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`clientId\` INT NOT NULL,
-      \`name\` VARCHAR(255) NOT NULL,
-      \`category\` VARCHAR(100) NOT NULL DEFAULT 'General',
-      \`description\` TEXT NULL,
-      \`validityDays\` INT NULL,
-      \`reminderDays\` INT NOT NULL DEFAULT 30,
-      \`isRequired\` TINYINT(1) NOT NULL DEFAULT 1,
-      \`active\` TINYINT(1) NOT NULL DEFAULT 1,
-      \`sortOrder\` INT NOT NULL DEFAULT 0,
-      \`customFields\` JSON NULL,
-      \`createdAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      \`updatedAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      KEY \`portalRequirementDefinitions_client_idx\` (\`clientId\`)
-    )`
-  );
-
-  await ensureRuntimeTable(
-    "portalClientReminderSettings",
-    `CREATE TABLE IF NOT EXISTS \`portalClientReminderSettings\` (
-      \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`clientId\` INT NOT NULL,
-      \`complianceEnabled\` TINYINT(1) NOT NULL DEFAULT 1,
-      \`documentEnabled\` TINYINT(1) NOT NULL DEFAULT 1,
-      \`includeMissingRequired\` TINYINT(1) NOT NULL DEFAULT 1,
-      \`includePendingReview\` TINYINT(1) NOT NULL DEFAULT 1,
-      \`documentLeadDays\` INT NOT NULL DEFAULT 14,
-      \`complianceEscalationDays\` INT NOT NULL DEFAULT 14,
-      \`documentEscalationDays\` INT NOT NULL DEFAULT 7,
-      \`sendToAssignedUsers\` TINYINT(1) NOT NULL DEFAULT 1,
-      \`sendToInternalAdmins\` TINYINT(1) NOT NULL DEFAULT 1,
-      \`escalationManagersOnly\` TINYINT(1) NOT NULL DEFAULT 1,
-      \`createdAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      \`updatedAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      UNIQUE KEY \`portalClientReminderSettings_client_unique\` (\`clientId\`),
-      KEY \`portalClientReminderSettings_client_idx\` (\`clientId\`)
-    )`
-  );
-
-  await ensureRuntimeTable(
-    "portalTechnicianRequirements",
-    `CREATE TABLE IF NOT EXISTS \`portalTechnicianRequirements\` (
-      \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`technicianId\` INT NOT NULL,
-      \`definitionId\` INT NOT NULL,
-      \`status\` ENUM('missing','current','no_expiry','expiring','expired','pending_review') NOT NULL DEFAULT 'missing',
-      \`issuedAt\` DATE NULL,
-      \`validUntil\` DATE NULL,
-      \`notes\` TEXT NULL,
-      \`customFieldValues\` JSON NULL,
-      \`uploadedByUserId\` INT NULL,
-      \`createdAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      \`updatedAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      UNIQUE KEY \`portalTechnicianRequirements_unique\` (\`technicianId\`, \`definitionId\`),
-      KEY \`portalTechnicianRequirements_definition_idx\` (\`definitionId\`)
-    )`
-  );
-
-  await ensureRuntimeTable(
-    "portalRequirementDocuments",
-    `CREATE TABLE IF NOT EXISTS \`portalRequirementDocuments\` (
-      \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`technicianRequirementId\` INT NOT NULL,
-      \`fileName\` VARCHAR(255) NOT NULL,
-      \`fileUrl\` TEXT NOT NULL,
-      \`fileKey\` VARCHAR(500) NOT NULL,
-      \`contentType\` VARCHAR(255) NULL,
-      \`uploadedByUserId\` INT NULL,
-      \`createdAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      KEY \`portalRequirementDocuments_requirement_idx\` (\`technicianRequirementId\`)
-    )`
-  );
-
-  await ensureRuntimeTable(
-    "portalRequirementSourceReferences",
-    `CREATE TABLE IF NOT EXISTS \`portalRequirementSourceReferences\` (
-      \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`technicianRequirementId\` INT NOT NULL,
-      \`sourceFileName\` VARCHAR(255) NOT NULL,
-      \`sourcePath\` TEXT NOT NULL,
-      \`importedByUserId\` INT NULL,
-      \`createdAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      KEY \`portalRequirementSourceReferences_requirement_idx\` (\`technicianRequirementId\`)
-    )`
-  );
+  // Tables are defined in drizzle/schema.ts and managed through drizzle migrations.
+  // Runtime deduplication is still needed for existing data:
   await ensurePortalRequirementDefinitionUniqueness();
   await ensurePortalTechnicianRequirementUniqueness();
-
-  await ensureRuntimeTable(
-    "portalClientDocuments",
-    `CREATE TABLE IF NOT EXISTS \`portalClientDocuments\` (
-      \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`clientId\` INT NOT NULL,
-      \`clientBranchId\` INT NULL,
-      \`title\` VARCHAR(255) NOT NULL,
-      \`category\` VARCHAR(120) NOT NULL DEFAULT 'General',
-      \`description\` TEXT NULL,
-      \`fileName\` VARCHAR(255) NOT NULL,
-      \`fileUrl\` TEXT NOT NULL,
-      \`fileKey\` VARCHAR(500) NOT NULL,
-      \`contentType\` VARCHAR(255) NULL,
-      \`reviewDate\` DATE NULL,
-      \`validUntil\` DATE NULL,
-      \`status\` ENUM('active','archived','superseded') NOT NULL DEFAULT 'active',
-      \`uploadedByUserId\` INT NULL,
-      \`createdAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      \`updatedAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      KEY \`portalClientDocuments_client_idx\` (\`clientId\`),
-      KEY \`portalClientDocuments_branch_idx\` (\`clientBranchId\`)
-    )`
-  );
-  await ensureRuntimeColumn("portalClientDocuments", "sourceFileName", "VARCHAR(255) NULL");
-  await ensureRuntimeColumn("portalClientDocuments", "sourcePath", "TEXT NULL");
-
-  await ensureRuntimeTable(
-    "portalClientComments",
-    `CREATE TABLE IF NOT EXISTS \`portalClientComments\` (
-      \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`clientId\` INT NOT NULL,
-      \`userId\` INT NOT NULL,
-      \`requestType\` ENUM('general_comment','contact_request','suggestion') NOT NULL DEFAULT 'general_comment',
-      \`subject\` VARCHAR(255) NOT NULL,
-      \`message\` TEXT NOT NULL,
-      \`status\` ENUM('open','acknowledged','closed') NOT NULL DEFAULT 'open',
-      \`internalNotes\` TEXT NULL,
-      \`createdAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      \`updatedAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      KEY \`portalClientComments_client_idx\` (\`clientId\`),
-      KEY \`portalClientComments_user_idx\` (\`userId\`)
-    )`
-  );
-
-  await ensureRuntimeTable(
-    "portalClientResources",
-    `CREATE TABLE IF NOT EXISTS \`portalClientResources\` (
-      \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`clientId\` INT NOT NULL,
-      \`clientBranchId\` INT NULL,
-      \`title\` VARCHAR(255) NOT NULL,
-      \`category\` VARCHAR(120) NOT NULL DEFAULT 'General',
-      \`description\` TEXT NULL,
-      \`resourceType\` ENUM('file','link') NOT NULL DEFAULT 'file',
-      \`linkUrl\` TEXT NULL,
-      \`fileName\` VARCHAR(255) NULL,
-      \`fileUrl\` TEXT NULL,
-      \`fileKey\` VARCHAR(500) NULL,
-      \`contentType\` VARCHAR(255) NULL,
-      \`sortOrder\` INT NOT NULL DEFAULT 0,
-      \`active\` TINYINT(1) NOT NULL DEFAULT 1,
-      \`uploadedByUserId\` INT NULL,
-      \`createdAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      \`updatedAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      KEY \`portalClientResources_client_idx\` (\`clientId\`),
-      KEY \`portalClientResources_branch_idx\` (\`clientBranchId\`)
-    )`
-  );
-
-  await ensureRuntimeTable(
-    "portalApprovalRequests",
-    `CREATE TABLE IF NOT EXISTS \`portalApprovalRequests\` (
-      \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`clientId\` INT NOT NULL,
-      \`entityType\` ENUM('technician','requirement_record','client_document','resource') NOT NULL,
-      \`action\` ENUM('create','update','delete','upsert') NOT NULL,
-      \`entityId\` INT NULL,
-      \`summary\` VARCHAR(255) NOT NULL,
-      \`payload\` JSON NULL,
-      \`status\` ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending',
-      \`submittedByUserId\` INT NOT NULL,
-      \`reviewedByUserId\` INT NULL,
-      \`reviewNotes\` TEXT NULL,
-      \`reviewedAt\` TIMESTAMP NULL,
-      \`createdAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      \`updatedAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      KEY \`portalApprovalRequests_client_idx\` (\`clientId\`),
-      KEY \`portalApprovalRequests_status_idx\` (\`status\`),
-      KEY \`portalApprovalRequests_submitter_idx\` (\`submittedByUserId\`)
-    )`
-  );
-
-  await ensureRuntimeTable(
-    "portalClientBranches",
-    `CREATE TABLE IF NOT EXISTS \`portalClientBranches\` (
-      \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`clientId\` INT NOT NULL,
-      \`sourceClientId\` INT NULL,
-      \`name\` VARCHAR(255) NOT NULL,
-      \`code\` VARCHAR(80) NULL,
-      \`description\` TEXT NULL,
-      \`active\` TINYINT(1) NOT NULL DEFAULT 1,
-      \`sortOrder\` INT NOT NULL DEFAULT 0,
-      \`createdAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      \`updatedAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      KEY \`portalClientBranches_client_idx\` (\`clientId\`)
-    )`
-  );
-
-  await ensureRuntimeTable(
-    "portalClientUserBranches",
-    `CREATE TABLE IF NOT EXISTS \`portalClientUserBranches\` (
-      \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`clientId\` INT NOT NULL,
-      \`userId\` INT NOT NULL,
-      \`branchId\` INT NOT NULL,
-      \`createdAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      \`updatedAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      UNIQUE KEY \`portalClientUserBranches_unique\` (\`clientId\`, \`userId\`, \`branchId\`),
-      KEY \`portalClientUserBranches_branch_idx\` (\`branchId\`)
-    )`
-  );
-
-  await ensureRuntimeTable(
-    "portalServiceDefinitions",
-    `CREATE TABLE IF NOT EXISTS \`portalServiceDefinitions\` (
-      \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`clientId\` INT NOT NULL,
-      \`title\` VARCHAR(255) NOT NULL,
-      \`category\` VARCHAR(120) NOT NULL DEFAULT 'General',
-      \`description\` TEXT NULL,
-      \`instructions\` TEXT NULL,
-      \`active\` TINYINT(1) NOT NULL DEFAULT 1,
-      \`sortOrder\` INT NOT NULL DEFAULT 0,
-      \`config\` JSON NULL,
-      \`createdAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      \`updatedAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      KEY \`portalServiceDefinitions_client_idx\` (\`clientId\`)
-    )`
-  );
-
-  await ensureRuntimeTable(
-    "portalServiceRequests",
-    `CREATE TABLE IF NOT EXISTS \`portalServiceRequests\` (
-      \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`clientId\` INT NOT NULL,
-      \`clientBranchId\` INT NULL,
-      \`serviceDefinitionId\` INT NULL,
-      \`userId\` INT NOT NULL,
-      \`technicianId\` INT NULL,
-      \`title\` VARCHAR(255) NOT NULL,
-      \`requestType\` VARCHAR(120) NOT NULL,
-      \`status\` VARCHAR(80) NOT NULL DEFAULT 'submitted',
-      \`preferredDate\` DATE NULL,
-      \`techniques\` JSON NULL,
-      \`details\` TEXT NULL,
-      \`requestedDocuments\` JSON NULL,
-      \`internalNotes\` TEXT NULL,
-      \`metadata\` JSON NULL,
-      \`createdAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      \`updatedAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      KEY \`portalServiceRequests_client_idx\` (\`clientId\`),
-      KEY \`portalServiceRequests_branch_idx\` (\`clientBranchId\`),
-      KEY \`portalServiceRequests_status_idx\` (\`status\`)
-    )`
-  );
-
-  await ensureRuntimeTable(
-    "portalAssessmentGuides",
-    `CREATE TABLE IF NOT EXISTS \`portalAssessmentGuides\` (
-      \`id\` INT AUTO_INCREMENT PRIMARY KEY,
-      \`clientId\` INT NOT NULL,
-      \`clientBranchId\` INT NULL,
-      \`title\` VARCHAR(255) NOT NULL,
-      \`techniqueName\` VARCHAR(255) NOT NULL,
-      \`description\` TEXT NULL,
-      \`bringItems\` JSON NULL,
-      \`companyItems\` JSON NULL,
-      \`active\` TINYINT(1) NOT NULL DEFAULT 1,
-      \`sortOrder\` INT NOT NULL DEFAULT 0,
-      \`createdAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      \`updatedAt\` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      KEY \`portalAssessmentGuides_client_idx\` (\`clientId\`),
-      KEY \`portalAssessmentGuides_branch_idx\` (\`clientBranchId\`)
-    )`
-  );
-
-  await ensureRuntimeColumn(
-    "portalRequirementDefinitions",
-    "customFields",
-    "JSON NULL"
-  );
-  await ensureRuntimeColumn(
-    "portalTechnicianRequirements",
-    "customFieldValues",
-    "JSON NULL"
-  );
-  await ensureRuntimeColumn(
-    "levelIIITechnicians",
-    "clientBranchId",
-    "INT NULL"
-  );
-  await ensureRuntimeColumn(
-    "portalClientDocuments",
-    "clientBranchId",
-    "INT NULL"
-  );
-  await ensureRuntimeColumn(
-    "portalClientResources",
-    "clientBranchId",
-    "INT NULL"
-  );
-  await ensureRuntimeColumn(
-    "portalClientBranches",
-    "sourceClientId",
-    "INT NULL"
-  );
-  await ensureRuntimeColumn(
-    "portalClientReminderSettings",
-    "complianceEnabled",
-    "TINYINT(1) NOT NULL DEFAULT 1"
-  );
-  await ensureRuntimeColumn(
-    "portalClientReminderSettings",
-    "documentEnabled",
-    "TINYINT(1) NOT NULL DEFAULT 1"
-  );
-  await ensureRuntimeColumn(
-    "portalClientReminderSettings",
-    "includeMissingRequired",
-    "TINYINT(1) NOT NULL DEFAULT 1"
-  );
-  await ensureRuntimeColumn(
-    "portalClientReminderSettings",
-    "includePendingReview",
-    "TINYINT(1) NOT NULL DEFAULT 1"
-  );
-  await ensureRuntimeColumn(
-    "portalClientReminderSettings",
-    "documentLeadDays",
-    "INT NOT NULL DEFAULT 14"
-  );
-  await ensureRuntimeColumn(
-    "portalClientReminderSettings",
-    "complianceEscalationDays",
-    "INT NOT NULL DEFAULT 14"
-  );
-  await ensureRuntimeColumn(
-    "portalClientReminderSettings",
-    "documentEscalationDays",
-    "INT NOT NULL DEFAULT 7"
-  );
-  await ensureRuntimeColumn(
-    "portalClientReminderSettings",
-    "sendToAssignedUsers",
-    "TINYINT(1) NOT NULL DEFAULT 1"
-  );
-  await ensureRuntimeColumn(
-    "portalClientReminderSettings",
-    "sendToInternalAdmins",
-    "TINYINT(1) NOT NULL DEFAULT 1"
-  );
-  await ensureRuntimeColumn(
-    "portalClientReminderSettings",
-    "escalationManagersOnly",
-    "TINYINT(1) NOT NULL DEFAULT 1"
-  );
-  await ensureRuntimeColumn(
-    "portalClientReminderSettings",
-    "allowedClientDocumentLabels",
-    "JSON NULL"
-  );
 }
 
 function cleanMethodsArray(

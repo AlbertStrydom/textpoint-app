@@ -8,7 +8,7 @@ on:
 
 env:
   NODE_VERSION: "20"
-  MYSQL_VERSION: "8.0"
+  POSTGRES_VERSION: "16"
 
 jobs:
   typecheck:
@@ -51,20 +51,20 @@ jobs:
     name: Server Tests
     runs-on: ubuntu-latest
     services:
-      mysql:
-        image: mysql:${{ env.MYSQL_VERSION }}
+      postgres:
+        image: postgres:${{ env.POSTGRES_VERSION }}
         env:
-          MYSQL_ROOT_PASSWORD: testpass
-          MYSQL_DATABASE: textpoint_test
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: textpoint_test
         options: >-
-          --health-cmd "mysqladmin ping -h localhost"
+          --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
         ports:
-          - 3306:3306
+          - 5432:5432
     env:
-      DATABASE_URL: mysql://root:testpass@127.0.0.1:3306/textpoint_test
+      DATABASE_URL: postgresql://postgres:testpass@127.0.0.1:5432/textpoint_test
       BETTER_AUTH_SECRET: ci-test-secret-do-not-use-in-production
       APP_BASE_URL: http://localhost:3000
       NODE_ENV: test

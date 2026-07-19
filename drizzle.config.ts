@@ -6,7 +6,7 @@ if (!connectionString) {
 }
 
 export default defineConfig({
-  schema: "./drizzle/schema.ts",
+  schema: ["./drizzle/schema.ts", "./drizzle/rbac_schema.ts"],
   out: "./drizzle",
   dialect: "postgresql", // MUST be 'postgresql' for Supabase
   dbCredentials: {

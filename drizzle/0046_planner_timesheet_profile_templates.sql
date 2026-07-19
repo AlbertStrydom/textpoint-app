@@ -1,4 +1,0 @@
-ALTER TABLE `plannerTimesheetProfiles`
-  ADD COLUMN `monThuTemplateId` INT NULL,
-  ADD COLUMN `fridayTemplateId` INT NULL,
-  ADD COLUMN `weekendTemplateId` INT NULL;

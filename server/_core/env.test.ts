@@ -4,7 +4,7 @@ import { evaluateEnvironmentReadiness, type Env } from "./env";
 const baseEnv: Env = {
   betterAuthSecret: "super-secret-value",
   appBaseUrl: "https://textpoint.example.org",
-  databaseUrl: "mysql://user:pass@db:3306/textpoint",
+  databaseUrl: "postgresql://user:pass@db:5432/textpoint",
   forgeApiUrl: undefined,
   forgeApiKey: undefined,
   localAuthBypass: false,

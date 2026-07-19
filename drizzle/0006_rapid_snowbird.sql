@@ -1,1 +1,0 @@
-ALTER TABLE `leads` ADD `interested_course_id` int;

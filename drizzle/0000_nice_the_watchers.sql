@@ -1217,3 +1217,61 @@ CREATE TABLE "users" (
 	CONSTRAINT "users_email_unique" UNIQUE("email"),
 	CONSTRAINT "users_calendarFeedToken_unique" UNIQUE("calendarFeedToken")
 );
+--> statement-breakpoint
+CREATE TABLE "company_settings" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"companyName" varchar(255) NOT NULL,
+	"companyLogo" text,
+	"companyLogoUrl" varchar(500),
+	"companyDescription" text,
+	"primaryColor" varchar(7),
+	"secondaryColor" varchar(7),
+	"timezone" varchar(50),
+	"dateFormat" varchar(20),
+	"currency" varchar(3),
+	"createdAt" timestamp DEFAULT now() NOT NULL,
+	"updatedAt" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "permissions" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" varchar(255) NOT NULL,
+	"description" text,
+	"category" varchar(100) NOT NULL,
+	"createdAt" timestamp DEFAULT now() NOT NULL,
+	"updatedAt" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "permissions_name_unique" UNIQUE("name")
+);
+--> statement-breakpoint
+CREATE TABLE "role_permissions" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"roleId" integer NOT NULL,
+	"permissionId" integer NOT NULL,
+	"createdAt" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "roles" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" varchar(255) NOT NULL,
+	"description" text,
+	"type" varchar(20) DEFAULT 'custom' NOT NULL,
+	"createdAt" timestamp DEFAULT now() NOT NULL,
+	"updatedAt" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "roles_name_unique" UNIQUE("name")
+);
+--> statement-breakpoint
+CREATE TABLE "user_permissions" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"userId" integer NOT NULL,
+	"permissionId" integer NOT NULL,
+	"grantedAt" timestamp DEFAULT now() NOT NULL,
+	"grantedBy" integer,
+	"createdAt" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "user_roles" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"userId" integer NOT NULL,
+	"roleId" integer NOT NULL,
+	"createdAt" timestamp DEFAULT now() NOT NULL
+);

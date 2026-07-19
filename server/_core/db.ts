@@ -1,7 +1,9 @@
-import { drizzle } from "drizzle-orm/mysql2";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
 import { ENV } from "./env";
 
-export const db = drizzle(ENV.databaseUrl);
+const pool = new Pool({ connectionString: ENV.databaseUrl });
+export const db = drizzle(pool);
 
 export function getDb() {
   return db;
