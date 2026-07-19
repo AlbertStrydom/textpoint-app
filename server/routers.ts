@@ -4980,7 +4980,7 @@ const authRouter = router({
       if (result && typeof result === "object" && "error" in result) {
         throw new TRPCError({ code: "UNAUTHORIZED", message: String((result as any).error) });
       }
-      const sessionId = typeof result === "number" ? result : (result as any)?.id ?? 0;
+      const sessionId = typeof result === "number" ? result : (result as any)?.token ?? 0;
       ctx.res.appendHeader("Set-Cookie", `${COOKIE_NAME}=${sessionId}; ${Object.entries(getSessionCookieOptions()).map(([k, v]) => `${k}=${v}`).join("; ")}`);
       const user = await getUserByEmail(input.email);
       return user;
