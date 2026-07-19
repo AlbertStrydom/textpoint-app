@@ -26,4 +26,7 @@ RUN mkdir -p /app/uploads
 
 EXPOSE 3000
 
-CMD ["npm", "run", "start"]
+# Keep drizzle-kit for migration on startup
+RUN npm install drizzle-kit@^0.31.10
+
+CMD ["sh", "-c", "npx drizzle-kit migrate 2>&1 && node dist/index.js"]

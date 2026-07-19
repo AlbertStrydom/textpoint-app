@@ -217,7 +217,7 @@ async function ensureAuthIdentityForUser(
 export async function getOrCreateLocalDevUser(data: {
   email: string;
   name: string;
-  role: "user" | "admin";
+  role: "user" | "admin" | "super_admin";
 }): Promise<User> {
   const existing = await getUserByEmail(data.email);
   if (existing) {

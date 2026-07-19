@@ -55,7 +55,7 @@ export async function createContext({ req, res }: CreateExpressContextOptions): 
       user = await db.getOrCreateLocalDevUser({
         email: ENV.localAuthEmail,
         name: ENV.localAuthName,
-        role: "admin",
+        role: "super_admin",
       });
     }
   } catch (err) {
